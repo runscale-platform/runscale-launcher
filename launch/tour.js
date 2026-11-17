@@ -32,16 +32,24 @@ function airSvg() {
   }
   const x0 = splitX(plate)
   const svg = el('svg', { class: 'ap', viewBox: `0 0 ${plate.w} ${plate.h}`, 'aria-hidden': 'true', focusable: 'false' })
+  svg.style.aspectRatio = `${plate.w} / ${plate.h}`
   const defs = el('defs')
   const grad = el('linearGradient', { id: 'ap-metal', gradientUnits: 'userSpaceOnUse', x1: x0, y1: 0, x2: plate.w, y2: 0 })
-  ;[['0', 'ap-m0'], ['0.32', 'ap-m1'], ['0.6', 'ap-m2'], ['1', 'ap-m3']].forEach(([offset, cls]) => {
-    grad.appendChild(el('stop', { offset, class: cls }))
-  })
+  const stops = [['0', 'ap-m0', '#b8b9c0'], ['0.32', 'ap-m1', '#f2f2f4'], ['0.6', 'ap-m2', '#d7d8dc'], ['1', 'ap-m3', '#8d9098']]
+  stops.forEach(([offset, cls, color]) => grad.appendChild(el('stop', { offset, class: cls, 'stop-color': color })))
   defs.appendChild(grad)
   svg.appendChild(defs)
-  svg.appendChild(el('rect', { class: 'ap-bed', x: 0, y: 0, width: plate.w, height: plate.h, rx: 1 }))
+  svg.appendChild(el('rect', { class: 'ap-bed', x: 0, y: 0, width: plate.w, height: plate.h, rx: 1, fill: '#0b0b0d' }))
+  const paint = {
+    'ap-off': ['#f2f2f4', '0.28'],
+    'ap-hole': ['#0b0b0d', '1'],
+    'ap-field': ['url(#ap-metal)', '1'],
+    'ap-on': ['#f2f2f4', '1'],
+    'ap-frame': ['#b8b9c0', '1'],
+  }
   ;[['ap-off', layers.off], ['ap-hole', layers.hole], ['ap-field', layers.field], ['ap-on', layers.on], ['ap-frame', layers.frame]].forEach(([cls, d]) => {
-    svg.appendChild(el('path', { class: cls, d }))
+    const [fill, opacity] = paint[cls]
+    svg.appendChild(el('path', { class: cls, d, fill, opacity }))
   })
   return svg
 }
@@ -119,8 +127,9 @@ function spraySvg(markD, plain) {
   const can = el('g', { class: 'sm-can', transform: 'translate(-80 400)' })
   const mistEl = el('circle', { class: 'sm-mist', r: 28 })
   const hold = el('g', { transform: `translate(${CAN_HOLD.dx} ${CAN_HOLD.dy}) rotate(${CAN_HOLD.rot})`, 'shape-rendering': 'crispEdges' })
-  hold.appendChild(el('path', { class: 'px-sil', d: CAN.silhouette }))
-  CAN.paints.forEach((p) => hold.appendChild(el('path', { class: `px-${p.k}`, d: p.d })))
+  const pxFill = { sil: '#8d9098', c: '#8d9098', o: '#8d9098', n: '#f2f2f4', h: '#f2f2f4', C: '#b8b9c0', B: '#b8b9c0', b: '#2563eb', L: '#6aa5ff' }
+  hold.appendChild(el('path', { class: 'px-sil', d: CAN.silhouette, fill: pxFill.sil }))
+  CAN.paints.forEach((p) => hold.appendChild(el('path', { class: `px-${p.k}`, d: p.d, fill: pxFill[p.k] || '#f2f2f4' })))
   can.appendChild(mistEl)
   can.appendChild(hold)
   svg.appendChild(can)
