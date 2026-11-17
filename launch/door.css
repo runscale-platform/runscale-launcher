@@ -153,15 +153,41 @@ h1 {
   text-align: center;
   text-decoration: none;
 }
-.tour-mark {
-  display: block;
-  width: min(78%, 320px);
-  aspect-ratio: 679 / 347;
-  margin-bottom: 6px;
-  background: currentColor;
-  -webkit-mask: url('../brand/ultra-mark.svg') center / contain no-repeat;
-  mask: url('../brand/ultra-mark.svg') center / contain no-repeat;
-}
+.tour-spray { display: block; width: min(78%, 320px); aspect-ratio: 679 / 347; margin-bottom: 6px; }
+.tour-air { display: block; width: min(78%, 300px); line-height: 0; margin: 2px 0 8px; }
+.sm { position: relative; width: 100%; aspect-ratio: 679 / 347; color: var(--text); }
+.sm-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.sm-ink path { fill: none; stroke: #fff; stroke-linecap: round; stroke-linejoin: round; }
+.sm-settle { fill: #fff; opacity: 0; }
+.sm-fill { fill: currentColor; }
+.sm-dots .sm-dot { fill: currentColor; opacity: 0.8; animation: sm-dot 1.3s ease-out forwards; }
+.sm-dots .sm-dot--stay { animation: sm-dot-stay 0.9s ease-out forwards; }
+@keyframes sm-dot { to { opacity: 0; } }
+@keyframes sm-dot-stay { to { opacity: 0.42; } }
+.sm-mist { fill: url(#sm-mist-g); transition: opacity 0.12s ease; }
+.sm-mist-0 { stop-color: currentColor; stop-opacity: 0.6; }
+.sm-mist-1 { stop-color: currentColor; stop-opacity: 0; }
+.sm-run { fill: none; stroke: currentColor; stroke-linecap: round; visibility: hidden; }
+.sm-run-tip { fill: currentColor; visibility: hidden; }
+.sm-puddle-paint { fill: currentColor; }
+.sm-puddle-wet { fill: #fff; opacity: 0.32; }
+.sm-can .px-sil, .sm-can .px-c, .sm-can .px-o { fill: #8d9098; }
+.sm-can .px-n, .sm-can .px-h { fill: var(--text); }
+.sm-can .px-C, .sm-can .px-B { fill: var(--text-sec); }
+.sm-can .px-b { fill: var(--blue); }
+.sm-can .px-L { fill: var(--text); }
+.ap { display: block; width: 100%; height: auto; overflow: visible; }
+.ap-bed { fill: var(--bg); }
+.ap-off { fill: var(--text); opacity: 0.13; }
+.ap-hole { fill: var(--text); opacity: 0.07; }
+.ap-on { fill: var(--text); }
+.ap-frame { fill: var(--text-sec); }
+.ap-field { fill: url(#ap-metal); }
+.ap-m0 { stop-color: var(--text-sec); }
+.ap-m1 { stop-color: var(--text); }
+.ap-m2 { stop-color: #d7d8dc; }
+.ap-m3 { stop-color: #8d9098; }
+@media (prefers-reduced-motion: reduce) { .sm-dots { display: none; } }
 .tour strong { font-size: clamp(26px, 7.4vw, 32px); font-weight: 800; line-height: 1.1; letter-spacing: -0.01em; }
 .tour-line { font-size: 15px; line-height: 1.4; color: var(--text-sec); }
 .keep { white-space: nowrap; }
