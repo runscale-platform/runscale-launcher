@@ -139,39 +139,83 @@ h1 {
 .tile b { font-size: 11px; letter-spacing: 0.06em; color: var(--text-sec); }
 .tile strong { font-size: 40px; font-weight: 700; letter-spacing: -0.03em; }
 .tile span { margin-top: auto; color: var(--text-sec); font-size: 13px; }
-.more {
-  display: block;
+.tour {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   margin-top: 18px;
-  padding: 16px 18px;
+  padding: 22px 18px 20px;
   border-radius: 16px;
   background: var(--glass);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: inherit;
+  text-align: center;
   text-decoration: none;
 }
-.more em { display: block; font-style: normal; color: var(--blue-text); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-.more strong { display: block; margin-top: 6px; font-size: 21px; }
-.more p { margin: 6px 0 0; color: var(--text-sec); }
-.trends {
+.tour-mark {
   display: block;
-  margin-top: 18px;
-  padding: 18px;
+  width: min(78%, 320px);
+  aspect-ratio: 679 / 347;
+  margin-bottom: 6px;
+  background: currentColor;
+  -webkit-mask: url('../brand/ultra-mark.svg') center / contain no-repeat;
+  mask: url('../brand/ultra-mark.svg') center / contain no-repeat;
+}
+.tour strong { font-size: clamp(26px, 7.4vw, 32px); font-weight: 800; line-height: 1.1; letter-spacing: -0.01em; }
+.tour-line { font-size: 15px; line-height: 1.4; color: var(--text-sec); }
+.keep { white-space: nowrap; }
+.tour-line svg { display: inline-block; width: 20px; height: 20px; vertical-align: -4px; margin-left: 2px; color: var(--blue-text); }
+.trends {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 28px;
+  padding: 16px;
   border-radius: 16px;
+  border: 1px solid var(--text);
   background: var(--text);
   color: var(--bg);
   text-decoration: none;
 }
-.trends strong { display: block; font-size: 22px; margin-bottom: 12px; }
-.plate { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+.trends-title { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.6; }
+.plates { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.plate { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .sq {
-  width: 44px; height: 44px; border-radius: 16px;
-  display: grid; place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: color-mix(in srgb, var(--bg) 9%, var(--text));
   color: var(--blue);
-  font-weight: 800; font-size: 22px;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
 }
-.plate small { display: block; font-size: 12px; line-height: 1.25; }
-.cta { display: block; margin-top: 14px; text-align: center; font-weight: 700; }
+.plate-text { min-width: 0; display: flex; flex-direction: column; }
+.plate-text b { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--blue); }
+.plate-text span { font-size: 12px; line-height: 1.25; opacity: 0.75; }
+.cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 46px;
+  margin: 0;
+  border-radius: 16px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+.cta svg { width: 18px; height: 18px; color: var(--blue-text); }
+@media (max-width: 400px) {
+  .sq { width: 44px; height: 44px; font-size: 22px; }
+  .plate-text span { font-size: 11px; }
+}
 .docs {
   display: grid;
   grid-template-columns: 44px minmax(0, 1fr) 18px;
@@ -238,10 +282,10 @@ h1 {
 .ico svg, .row > .go { width: 20px; height: 20px; }
 .row > .go { color: #5f6169; }
 .txt { display: grid; gap: 3px; min-width: 0; }
-.name { font-size: 16px; font-weight: 600; line-height: 1.25; }
+.legal .name { font-size: 16px; font-weight: 600; line-height: 1.25; }
 .sub { font-size: 13.5px; line-height: 1.35; color: #5f6169; }
 .pill { padding: 7px 12px; border-radius: 999px; background: #e7e9f1; font-size: 13px; font-weight: 600; }
-.name--mail { color: #1d4ed8; }
+.legal .name--mail { color: #1d4ed8; }
 .ico--mail { background: #2563eb; color: #fff; }
 .op { margin: 0; padding: 14px 14px 16px; background: #eff1f6; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; border-top: 1px solid #e2e4eb; }
 .op-who { grid-column: 1 / -1; }

@@ -11,4 +11,8 @@ test('на двери блок «Всё прозрачно» и окно cookies
   assert.match(html, /Только необходимые/)
   assert.match(html, /Cookies и Метрика/)
   assert.doesNotMatch(html, /Счётчик включится/)
+  assert.match(html, /class="tour"/)
+  assert.match(html, /class="plates"/)
+  assert.match(html, /Рынки/)
+  assert.match(html, /Сводки/)
 })
