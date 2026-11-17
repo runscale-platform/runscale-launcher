@@ -5,6 +5,7 @@
 Ссылка для шапки, со слэшем после `launch`:
 
 - `https://x.gderost.ru/launch/?from=instagram-runscale`
+- `https://x.gderost.ru/launch/?from=instagram-stories`
 - `https://x.gderost.ru/launch/?from=instagram-izumov`
 - `https://x.gderost.ru/launch/?from=telegram-izumov`
 - `https://x.gderost.ru/launch/?from=telegram-pavel`
