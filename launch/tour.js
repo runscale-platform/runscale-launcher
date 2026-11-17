@@ -76,7 +76,10 @@ export async function mountTour(host) {
   const spray = host.querySelector('.tour-spray')
   const air = host.querySelector('.tour-air')
   if (!spray || !air) return
-  air.appendChild(airSvg())
+  // Точечная плашка в Instagram остаётся серой: стили SVG там не доходят.
+  // В обычном браузере она как на двери Ультры, во встроенном — та же надпись вёрсткой.
+  if (IN_APP) air.querySelector('.ap')?.remove()
+  else air.replaceChildren(airSvg())
   const raw = await fetch(new URL('../brand/ultra-mark.svg', import.meta.url)).then((r) => r.text())
   const markD = (raw.match(/ d="([^"]+)"/) || ['', ''])[1]
   spray.appendChild(spraySvg(markD, IN_APP))
