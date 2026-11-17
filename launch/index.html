@@ -10,7 +10,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="stylesheet" href="./door.css?v=6">
+  <link rel="stylesheet" href="./door.css?v=7">
 </head>
 <body>
   <main class="page">
@@ -28,7 +28,7 @@
     </div>
     <a class="tour" data-door="live">
       <span class="tour-spray" aria-hidden="true"></span>
-      <span class="tour-air" aria-hidden="true"><span class="air"><span class="air-l">Ранскеил</span><span class="air-r">В эфире</span></span></span>
+      <span class="tour-air" aria-hidden="true"></span>
       <strong>Экскурсия в Ультру</strong>
       <span class="tour-line">Сеть игровых парков управляет бизнесом на <span class="keep">Ранскеил.<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></span>
     </a>
@@ -82,8 +82,8 @@
     </div>
   </section>
   <script type="module">
-    import { METRIKA_HOST, METRIKA_ID, doors, escapeHref, launchMark } from './door.js?v=6'
-    import { mountTour } from './tour.js?v=6'
+    import { METRIKA_HOST, METRIKA_ID, doors, escapeHref, launchMark } from './door.js?v=7'
+    import { mountTour } from './tour.js?v=7'
     mountTour(document.querySelector('.tour'))
     const CHEV = '<svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>'
     const CARDS = [
