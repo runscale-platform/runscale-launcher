@@ -15,4 +15,6 @@ test('на двери блок «Всё прозрачно» и окно cookies
   assert.match(html, /class="plates"/)
   assert.match(html, /Рынки/)
   assert.match(html, /Сводки/)
+  assert.match(html, /defer: true/)
+  assert.match(html, /ultra\.runscale\.ru\/launch\/\?from=/)
 })

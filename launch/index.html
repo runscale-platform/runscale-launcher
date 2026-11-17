@@ -108,6 +108,12 @@
       if (!ym || location.hostname !== METRIKA_HOST) return
       ym(METRIKA_ID, 'reachGoal', name, props)
     }
+    // Счётчик 113084253 принимает адреса только ultra.runscale.ru (фильтр only_mirrors).
+    // Хит с настоящего адреса x.gderost.ru Метрика выбрасывает, и в Роторе остаются нули.
+    // Визит пишется на /launch с той же меткой from: Ротор читает именно её.
+    function countedPage() {
+      return 'https://ultra.runscale.ru/launch/?from=' + encodeURIComponent(mark)
+    }
     function arm() {
       if (location.hostname !== METRIKA_HOST) return
       if (!window.ym) {
@@ -116,7 +122,8 @@
         s.async = true
         s.src = 'https://mc.yandex.ru/metrika/tag.js?id=' + METRIKA_ID
         document.head.appendChild(s)
-        window.ym(METRIKA_ID, 'init', { clickmap: true, trackLinks: true, accurateTrackBounce: true })
+        window.ym(METRIKA_ID, 'init', { clickmap: true, trackLinks: true, accurateTrackBounce: true, defer: true })
+        window.ym(METRIKA_ID, 'hit', countedPage(), { title: document.title, referer: document.referrer })
       }
       goal('launch_open', { from: mark })
     }
