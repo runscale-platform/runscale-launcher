@@ -29,11 +29,47 @@
       <span class="plate"><span class="sq">7</span><span><small>Что брать:</small><small>драйверы роста</small></span></span>
       <span class="cta">Тренды на моём рынке</span>
     </a>
-    <div class="consent" id="consent" hidden>
-      <p>Счётчик включится после согласия. <a href="https://ultra.runscale.ru/policy">Политика</a></p>
-      <button type="button" id="accept">Принять все</button>
-    </div>
+    <button type="button" class="docs" id="docs-open">
+      <span class="docs-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4.2 2.7 7.1 7 8.5 4.3-1.4 7-4.3 7-8.5V6l-7-3z"/><path d="m9 12 2 2 4-4"/></svg></span>
+      <span class="docs-t"><b>Всё прозрачно.</b><small>Соглашение о конфиденциальности, оферта, политика данных</small></span>
+      <svg class="docs-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
   </main>
+  <div class="modal" id="docs-modal" hidden>
+    <div class="modal-scrim" data-close></div>
+    <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="docs-title">
+      <header class="modal-head">
+        <h2 id="docs-title">Всё прозрачно.</h2>
+        <button type="button" class="modal-x" id="docs-close" aria-label="Закрыть"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+      </header>
+      <div class="legal">
+        <a class="row" href="https://ultra.runscale.ru/terms"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M8 13h8M8 17h6"/></svg></span><span class="txt"><span class="name">Условия использования</span><span class="sub">Что значит заявка и кто за что отвечает</span></span><svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+        <a class="row" href="https://ultra.runscale.ru/confidentiality"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><rect x="9" y="13" width="6" height="5" rx="1"/><path d="M10 13v-1a2 2 0 0 1 4 0v1"/></svg></span><span class="txt"><span class="name">Соглашение о конфиденциальности (NDA)</span><span class="sub">Как бережём сведения о бизнесе до и после оплаты</span></span><svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+        <a class="row" href="https://ultra.runscale.ru/policy"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4.2 2.7 7.1 7 8.5 4.3-1.4 7-4.3 7-8.5V6l-7-3z"/><path d="m9 12 2 2 4-4"/></svg></span><span class="txt"><span class="name">Политика обработки данных</span><span class="sub">Какие данные храним, зачем и сколько</span></span><svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+        <a class="row" href="https://ultra.runscale.ru/consent"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 8-8h1.2a2 2 0 0 1 1.6.8L16 6.5a2 2 0 0 0 1.6.8H19a2 2 0 0 1 2 2V12a8 8 0 1 1-17 0z"/><path d="m9 12 2 2 4-4"/></svg></span><span class="txt"><span class="name">Согласие на обработку данных</span><span class="sub">Что подтверждает галочка в заявке</span></span><svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+        <a class="row" href="https://ultra.runscale.ru/offer"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg></span><span class="txt"><span class="name">Оферта Ранскеил Фокус</span><span class="sub">Цена, переносы и возврат денег</span></span><svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
+        <button type="button" class="row" id="cookie-settings">
+          <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9 3.5 3.5 0 0 1-4-4 3.5 3.5 0 0 1-5-5z"/><path d="M8.5 8.5h.01M16 15.5h.01M12 12h.01"/></svg></span>
+          <span class="txt"><span class="name">Cookies и Метрика</span><span class="sub" id="cookie-state">Пока не выбрано</span></span>
+          <span class="pill">Настроить</span>
+        </button>
+        <a class="row row--mail" href="mailto:info@runscale.ru"><span class="ico ico--mail" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg></span><span class="txt"><span class="name name--mail">info@runscale.ru</span><span class="sub">Вопросы о данных — ответим за 10 рабочих дней</span></span><svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+        <dl class="op">
+          <div class="op-who"><dt>Оператор данных</dt><dd>ИП Моторин Павел Анатольевич</dd></div>
+          <div><dt>ИНН</dt><dd>772448908064</dd></div>
+          <div><dt>ОГРНИП</dt><dd>321774600628846</dd></div>
+        </dl>
+      </div>
+    </section>
+  </div>
+  <section class="cookie" id="cookie" hidden role="dialog" aria-label="Cookies на этом сайте">
+    <p class="cookie-title">Cookies на этом сайте</p>
+    <p class="cookie-text">Часть из них нужна, чтобы сайт работал: они помнят ваш выбор и приглашение, по которому вы пришли. Остальное — Яндекс Метрика: она считает визиты и записывает, как листают страницу. Её включим только с вашего согласия. <a href="https://ultra.runscale.ru/legal/policy/policy-2026-10-12/18278bd8caa829bf138e29e2a17622ce41de24463da73949b06faaf41f30bd20#cookies">Подробнее в политике</a></p>
+    <div class="cookie-actions">
+      <button type="button" class="cookie-btn cookie-btn--main" id="accept">Принять все</button>
+      <button type="button" class="cookie-btn" id="necessary">Только необходимые</button>
+    </div>
+  </section>
   <script type="module">
     import { METRIKA_HOST, METRIKA_ID, doors, launchMark } from './door.js'
     const CHEV = '<svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>'
@@ -58,7 +94,6 @@
       a.href = href[id]
     }
     const KEY = 'runscale.ultra.consent.v1'
-    const box = document.getElementById('consent')
     function saved() {
       try { return JSON.parse(localStorage.getItem(KEY) || 'null') } catch { return null }
     }
@@ -79,14 +114,36 @@
       }
       goal('launch_open', { from: mark })
     }
+    const cookie = document.getElementById('cookie')
+    const modal = document.getElementById('docs-modal')
+    const state = document.getElementById('cookie-state')
+    function paint() {
+      const have = saved()
+      state.textContent = have?.decision === 'all' ? 'Приняты все' : have?.decision === 'necessary' ? 'Только необходимые' : 'Пока не выбрано'
+    }
+    function decide(decision) {
+      const before = saved()
+      localStorage.setItem(KEY, JSON.stringify({ decision, analytics: decision === 'all', policy: 'policy-2026-10-12', at: new Date().toISOString() }))
+      cookie.hidden = true
+      paint()
+      if (decision === 'all') arm()
+      else if (before && before.decision === 'all') window['disableYaCounter' + METRIKA_ID] = true
+    }
+    function setModal(open) {
+      modal.hidden = !open
+      document.body.style.overflow = open ? 'hidden' : ''
+      if (open) document.getElementById('docs-close').focus()
+    }
+    paint()
     const have = saved()
     if (have && have.decision === 'all') arm()
-    else box.hidden = false
-    document.getElementById('accept').onclick = () => {
-      localStorage.setItem(KEY, JSON.stringify({ decision: 'all', analytics: true, policy: 'policy-2026-10-12', at: new Date().toISOString() }))
-      box.hidden = true
-      arm()
-    }
+    else if (!have) setTimeout(() => { cookie.hidden = false }, 900)
+    document.getElementById('accept').onclick = () => decide('all')
+    document.getElementById('necessary').onclick = () => decide('necessary')
+    document.getElementById('cookie-settings').onclick = () => { cookie.hidden = false }
+    document.getElementById('docs-open').onclick = () => setModal(true)
+    modal.addEventListener('click', (event) => { if (event.target.closest('[data-close], #docs-close')) setModal(false) })
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modal.hidden) setModal(false) })
     document.body.addEventListener('click', (event) => {
       const a = event.target.closest('[data-door]')
       if (!a) return
