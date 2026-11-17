@@ -155,7 +155,8 @@ h1 {
 }
 .tour-spray { display: block; width: min(78%, 320px); aspect-ratio: 679 / 347; margin-bottom: 6px; }
 .tour-air { display: block; width: min(78%, 300px); line-height: 0; margin: 2px 0 8px; }
-.sm { position: relative; width: 100%; aspect-ratio: 679 / 347; color: var(--text); }
+.sm { position: relative; width: 100%; aspect-ratio: 679 / 347; color: #6aa5ff; }
+.sm.is-plain .sm-ink path { stroke: currentColor; }
 .sm-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .sm-ink path { fill: none; stroke: #fff; stroke-linecap: round; stroke-linejoin: round; }
 .sm-settle { fill: #fff; opacity: 0; }

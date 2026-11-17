@@ -8,6 +8,9 @@ import {
 import { airPlate, dotsPath, splitX } from './airPlate.js'
 
 const NS = 'http://www.w3.org/2000/svg'
+// Встроенный браузер Instagram не перерисовывает SVG-маску и часто включает «уменьшить движение»,
+// поэтому знак там не пишется. Штрихи рисуются сами, кадры идут по таймеру.
+const IN_APP = /Instagram|FBAN|FBAV|FB_IAB/i.test(navigator.userAgent)
 const CAN = canPaths()
 const PUDDLE = puddlePixels()
 const TL = timeline()
@@ -50,13 +53,13 @@ export async function mountTour(host) {
   air.appendChild(airSvg())
   const raw = await fetch(new URL('../brand/ultra-mark.svg', import.meta.url)).then((r) => r.text())
   const markD = (raw.match(/ d="([^"]+)"/) || ['', ''])[1]
-  spray.appendChild(spraySvg(markD))
+  spray.appendChild(spraySvg(markD, IN_APP))
   play(spray.querySelector('.sm-svg'))
 }
 
-function spraySvg(markD) {
+function spraySvg(markD, plain) {
   const root = document.createElement('div')
-  root.className = 'sm'
+  root.className = 'sm' + (plain ? ' is-plain' : '')
   root.setAttribute('role', 'img')
   root.setAttribute('aria-label', 'Ультра')
   const svg = el('svg', { class: 'sm-svg', viewBox: `0 0 ${VIEW.w} ${VIEW.h}`, 'aria-hidden': 'true' })
@@ -76,22 +79,26 @@ function spraySvg(markD) {
   mist.appendChild(el('stop', { offset: '1', class: 'sm-mist-1' }))
   defs.appendChild(mist)
   const mask = el('mask', { id: 'sm-mask', maskUnits: 'userSpaceOnUse', x: -30, y: -30, width: VIEW.w + 60, height: VIEW.h + 60 })
-  const ink = el('g', { filter: 'url(#sm-rough)', class: 'sm-ink' })
+  const ink = el('g', { class: 'sm-ink' })
+  if (!plain) ink.setAttribute('filter', 'url(#sm-rough)')
   const strokes = STROKES.map((p) => el('path', { d: polyD(p), 'stroke-width': BRUSH }))
   const drips = DRIPS.map((p) => el('path', { d: polyD(p), 'stroke-width': DRIP_BRUSH }))
   strokes.forEach((p) => ink.appendChild(p))
   drips.forEach((p) => ink.appendChild(p))
-  mask.appendChild(ink)
   const settle = el('rect', { class: 'sm-settle', x: -30, y: -30, width: VIEW.w + 60, height: VIEW.h + 60 })
-  mask.appendChild(settle)
-  defs.appendChild(mask)
+  if (!plain) {
+    mask.appendChild(ink)
+    mask.appendChild(settle)
+    defs.appendChild(mask)
+  }
   svg.appendChild(defs)
-  svg.appendChild(el('path', { class: 'sm-fill', d: markD, 'fill-rule': 'evenodd', mask: 'url(#sm-mask)' }))
+  if (plain) svg.appendChild(ink)
+  else svg.appendChild(el('path', { class: 'sm-fill', d: markD, 'fill-rule': 'evenodd', mask: 'url(#sm-mask)' }))
   const runs = el('g', { class: 'sm-runs' })
   const runPaths = []
   const runTips = []
   RUNS.forEach((r, i) => {
-    const g = el('g', { filter: `url(#sm-run-f${i})` })
+    const g = el('g', plain ? {} : { filter: `url(#sm-run-f${i})` })
     const path = el('path', { class: 'sm-run', d: `M${r.x} ${r.y}V${r.y}`, 'stroke-width': RUN_BRUSH })
     const tip = el('circle', { class: 'sm-run-tip', cx: r.x, cy: r.y, r: RUN_BRUSH * 0.82 })
     g.appendChild(path)
@@ -118,7 +125,7 @@ function spraySvg(markD) {
   can.appendChild(hold)
   svg.appendChild(can)
   root.appendChild(svg)
-  svg._spray = { strokes, drips, settle, can, dots, mistEl, puddle, puddlePaint, puddleWet, runPaths, runTips }
+  svg._spray = { strokes, drips, settle, can, dots, mistEl, puddle, puddlePaint, puddleWet, runPaths, runTips, plain }
   return root
 }
 
@@ -174,7 +181,8 @@ function play(svg) {
     const node = it.kind === 'stroke' ? s.strokes[it.i] : s.drips[it.i]
     node.style.strokeDasharray = String(it.len + 0.02)
     node.style.strokeDashoffset = String(it.len)
-    node.style.visibility = 'hidden'
+    if (s.plain) node.style.opacity = '0'
+    else node.style.visibility = 'hidden'
   })
   const w = svg.getBoundingClientRect().width || VIEW.w
   canScale = Math.min(1.8, Math.max(1, 0.8 / (w / VIEW.w)))
@@ -185,7 +193,7 @@ function play(svg) {
   setPuddle(0)
   setRuns(0)
 
-  const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  const reduce = !s.plain && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
   if (reduce) {
     s.strokes.forEach((node) => { node.style.strokeDashoffset = '0'; node.style.visibility = 'visible' })
     s.drips.forEach((node) => { node.style.strokeDashoffset = '0'; node.style.visibility = 'visible' })
@@ -204,7 +212,8 @@ function play(svg) {
     TL.items.forEach((it) => {
       const node = it.kind === 'stroke' ? s.strokes[it.i] : s.drips[it.i]
       const d = drawn(it, ms)
-      node.style.visibility = d > 0.5 ? 'visible' : 'hidden'
+      if (s.plain) node.style.opacity = d > 0.5 ? '1' : '0'
+      else node.style.visibility = d > 0.5 ? 'visible' : 'hidden'
       node.style.strokeDashoffset = String(it.len - d + 0.01)
     })
     s.settle.style.opacity = String(Math.min(1, Math.max(0, (ms - TL.settleStart) / 450)))
@@ -229,10 +238,14 @@ function play(svg) {
     }
     if (ms >= TL.end) setRuns(ms - TL.end)
     const busy = Math.max(TL.end + 650, TL.strokesEnd + FALL_TOTAL)
-    if (ms < busy) raf = requestAnimationFrame(frame)
-    else if (ms < TL.end + RUN_TIME) tick = setTimeout(() => { raf = requestAnimationFrame(frame) }, 90)
+    if (ms < busy) schedule()
+    else if (ms < TL.end + RUN_TIME) tick = setTimeout(() => schedule(), 90)
     else setRuns(RUN_TIME)
   }
-  window.setTimeout(() => { raf = requestAnimationFrame(frame) }, 380)
+  function schedule() {
+    if (s.plain) tick = setTimeout(() => frame(performance.now()), 32)
+    else raf = requestAnimationFrame(frame)
+  }
+  window.setTimeout(schedule, 380)
   window.addEventListener('pagehide', () => { if (raf) cancelAnimationFrame(raf); if (tick) clearTimeout(tick) }, { once: true })
 }
