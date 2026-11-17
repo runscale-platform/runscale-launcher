@@ -21,6 +21,16 @@ function el(name, attrs = {}) {
   return node
 }
 
+// Цвет в атрибуте проигрывает таблице стилей. Старая таблица из кэша Instagram
+// красит фигуры через переменные, которые там не работают, и рисунок серый.
+function paint(node, fill, opacity) {
+  node.setAttribute('fill', fill)
+  node.style.setProperty('fill', fill, 'important')
+  if (opacity == null) return
+  node.setAttribute('opacity', opacity)
+  node.style.setProperty('opacity', opacity, 'important')
+}
+
 function airSvg() {
   const plate = airPlate('Ранскеил', 'В эфире')
   const layers = {
@@ -36,11 +46,17 @@ function airSvg() {
   const defs = el('defs')
   const grad = el('linearGradient', { id: 'ap-metal', gradientUnits: 'userSpaceOnUse', x1: x0, y1: 0, x2: plate.w, y2: 0 })
   const stops = [['0', 'ap-m0', '#b8b9c0'], ['0.32', 'ap-m1', '#f2f2f4'], ['0.6', 'ap-m2', '#d7d8dc'], ['1', 'ap-m3', '#8d9098']]
-  stops.forEach(([offset, cls, color]) => grad.appendChild(el('stop', { offset, class: cls, 'stop-color': color })))
+  stops.forEach(([offset, cls, color]) => {
+    const stop = el('stop', { offset, class: cls, 'stop-color': color })
+    stop.style.setProperty('stop-color', color, 'important')
+    grad.appendChild(stop)
+  })
   defs.appendChild(grad)
   svg.appendChild(defs)
-  svg.appendChild(el('rect', { class: 'ap-bed', x: 0, y: 0, width: plate.w, height: plate.h, rx: 1, fill: '#0b0b0d' }))
-  const paint = {
+  const bed = el('rect', { class: 'ap-bed', x: 0, y: 0, width: plate.w, height: plate.h, rx: 1, fill: '#0b0b0d' })
+  paint(bed, '#0b0b0d')
+  svg.appendChild(bed)
+  const fills = {
     'ap-off': ['#f2f2f4', '0.28'],
     'ap-hole': ['#0b0b0d', '1'],
     'ap-field': ['url(#ap-metal)', '1'],
@@ -48,8 +64,10 @@ function airSvg() {
     'ap-frame': ['#b8b9c0', '1'],
   }
   ;[['ap-off', layers.off], ['ap-hole', layers.hole], ['ap-field', layers.field], ['ap-on', layers.on], ['ap-frame', layers.frame]].forEach(([cls, d]) => {
-    const [fill, opacity] = paint[cls]
-    svg.appendChild(el('path', { class: cls, d, fill, opacity }))
+    const [fill, opacity] = fills[cls]
+    const path = el('path', { class: cls, d, fill, opacity })
+    paint(path, fill, opacity)
+    svg.appendChild(path)
   })
   return svg
 }
@@ -93,6 +111,7 @@ function spraySvg(markD, plain) {
   const drips = DRIPS.map((p) => el('path', { d: polyD(p), 'stroke-width': DRIP_BRUSH }))
   strokes.forEach((p) => ink.appendChild(p))
   drips.forEach((p) => ink.appendChild(p))
+  if (plain) for (const path of [...strokes, ...drips]) path.style.setProperty('stroke', '#6aa5ff', 'important')
   const settle = el('rect', { class: 'sm-settle', x: -30, y: -30, width: VIEW.w + 60, height: VIEW.h + 60 })
   if (!plain) {
     mask.appendChild(ink)
@@ -128,8 +147,14 @@ function spraySvg(markD, plain) {
   const mistEl = el('circle', { class: 'sm-mist', r: 28 })
   const hold = el('g', { transform: `translate(${CAN_HOLD.dx} ${CAN_HOLD.dy}) rotate(${CAN_HOLD.rot})`, 'shape-rendering': 'crispEdges' })
   const pxFill = { sil: '#8d9098', c: '#8d9098', o: '#8d9098', n: '#f2f2f4', h: '#f2f2f4', C: '#b8b9c0', B: '#b8b9c0', b: '#2563eb', L: '#6aa5ff' }
-  hold.appendChild(el('path', { class: 'px-sil', d: CAN.silhouette, fill: pxFill.sil }))
-  CAN.paints.forEach((p) => hold.appendChild(el('path', { class: `px-${p.k}`, d: p.d, fill: pxFill[p.k] || '#f2f2f4' })))
+  const sil = el('path', { class: 'px-sil', d: CAN.silhouette, fill: pxFill.sil })
+  paint(sil, pxFill.sil)
+  hold.appendChild(sil)
+  CAN.paints.forEach((p) => {
+    const path = el('path', { class: `px-${p.k}`, d: p.d, fill: pxFill[p.k] || '#f2f2f4' })
+    paint(path, pxFill[p.k] || '#f2f2f4')
+    hold.appendChild(path)
+  })
   can.appendChild(mistEl)
   can.appendChild(hold)
   svg.appendChild(can)
