@@ -6,6 +6,9 @@
   <title>Ранскеил – Рост под контролем</title>
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#0B0B0D">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="./door.css">
 </head>
 <body>
@@ -78,7 +81,7 @@
     </div>
   </section>
   <script type="module">
-    import { METRIKA_HOST, METRIKA_ID, doors, launchMark } from './door.js'
+    import { METRIKA_HOST, METRIKA_ID, doors, escapeHref, launchMark } from './door.js'
     import { mountTour } from './tour.js'
     mountTour(document.querySelector('.tour'))
     const CHEV = '<svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>'
@@ -165,9 +168,14 @@
     modal.addEventListener('click', (event) => { if (event.target.closest('[data-close], #docs-close')) setModal(false) })
     document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !modal.hidden) setModal(false) })
     document.body.addEventListener('click', (event) => {
-      const a = event.target.closest('[data-door]')
+      const a = event.target.closest('a[href]')
       if (!a) return
-      goal('launch_' + a.dataset.door, { door: a.dataset.door, from: mark })
+      if (a.dataset.door) goal('launch_' + a.dataset.door, { door: a.dataset.door, from: mark })
+      const next = escapeHref(a.href, navigator.userAgent)
+      if (next === a.href) return
+      // Новое окно Instagram снова открывает у себя. Схему грузит это же окно.
+      a.target = '_self'
+      a.href = next
     })
   </script>
 </body>

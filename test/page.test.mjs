@@ -23,4 +23,6 @@ test('на двери блок «Всё прозрачно» и окно cookies
   assert.match(html, /Стартовый багфикс/)
   assert.doesNotMatch(html, /Тест-драйв/)
   assert.match(html, /target = '_blank'/)
+  assert.match(html, /escapeHref/)
+  assert.match(html, /rel="icon" href="\/favicon.svg"/)
 })
