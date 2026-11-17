@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ранскеил – Рост под контролем</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0B0B0D">
+  <link rel="stylesheet" href="./door.css">
+</head>
+<body>
+  <main class="page">
+    <div class="mark" role="img" aria-label="Ранскеил"><i></i>РАНСКЕИЛ</div>
+    <nav class="stack" aria-label="Как начать"></nav>
+    <h1>Рост&nbsp;— это команда.</h1>
+    <p class="lead">156 чекапов, 339 сигналов,<br>32 разбора – и мы растём.</p>
+    <div class="parks" aria-label="Игровые парки">
+      <div class="park"><b class="num">+29%</b><span class="side"><span class="kick">4 месяца</span><span class="chip">выручка</span></span></div>
+      <div class="park park--hot"><b class="num">106%</b><span class="side"><span class="kick">ноябрь</span><span class="chip">прогноз</span></span></div>
+    </div>
+    <div class="tiles" style="margin-top:8px">
+      <div class="tile"><b>СИГНАЛЫ</b><strong>339</strong><span>156 чекапов</span></div>
+      <div class="tile"><b>РАЗБОРЫ</b><strong>32</strong><span>488 задач</span></div>
+    </div>
+    <a class="more" data-door="live"><em>В эфире</em><strong>Экскурсия в Ультру</strong><p>Сеть игровых парков управляет бизнесом на Ранскеил.</p></a>
+    <a class="trends" data-door="trends">
+      <strong>Ранскеил Тренды</strong>
+      <span class="plate"><span class="sq">44</span><span><small>Прогнозы на</small><small>честной цифре</small></span></span>
+      <span class="plate"><span class="sq">7</span><span><small>Что брать:</small><small>драйверы роста</small></span></span>
+      <span class="cta">Тренды на моём рынке</span>
+    </a>
+    <div class="consent" id="consent" hidden>
+      <p>Счётчик включится после согласия. <a href="https://ultra.runscale.ru/policy">Политика</a></p>
+      <button type="button" id="accept">Принять все</button>
+    </div>
+  </main>
+  <script type="module">
+    import { METRIKA_HOST, METRIKA_ID, doors, launchMark } from './door.js'
+    const CHEV = '<svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>'
+    const CARDS = [
+      ['focus', 'card card--fill', 'Ранскеил Фокус', 'Срочная помощь владельцу', 'Тест-драйв'],
+      ['ultra', 'card card--line', 'Ранскеил Ультра', 'Бизнес-машина', 'Буткемп'],
+      ['track', 'card card--line', 'Ранскеил Трек', 'Расти каждый день', 'Бесплатно'],
+    ]
+    const mark = launchMark(location.search)
+    const href = doors(mark)
+    const nav = document.querySelector('.stack')
+    for (const [id, cls, label, title, badge] of CARDS) {
+      const a = document.createElement('a')
+      a.className = cls
+      a.href = href[id]
+      a.dataset.door = id
+      a.innerHTML = `<span class="body"><span class="label">${label}</span><span class="name">${title}</span><span class="badge">${badge}</span></span>${CHEV}`
+      nav.appendChild(a)
+    }
+    for (const id of ['live', 'trends']) {
+      const a = document.querySelector(`[data-door="${id}"]`)
+      a.href = href[id]
+    }
+    const KEY = 'runscale.ultra.consent.v1'
+    const box = document.getElementById('consent')
+    function saved() {
+      try { return JSON.parse(localStorage.getItem(KEY) || 'null') } catch { return null }
+    }
+    function goal(name, props) {
+      const ym = window.ym
+      if (!ym || location.hostname !== METRIKA_HOST) return
+      ym(METRIKA_ID, 'reachGoal', name, props)
+    }
+    function arm() {
+      if (location.hostname !== METRIKA_HOST) return
+      if (!window.ym) {
+        window.ym = function () { (window.ym.a = window.ym.a || []).push(arguments) }
+        const s = document.createElement('script')
+        s.async = true
+        s.src = 'https://mc.yandex.ru/metrika/tag.js?id=' + METRIKA_ID
+        document.head.appendChild(s)
+        window.ym(METRIKA_ID, 'init', { clickmap: true, trackLinks: true, accurateTrackBounce: true })
+      }
+      goal('launch_open', { from: mark })
+    }
+    const have = saved()
+    if (have && have.decision === 'all') arm()
+    else box.hidden = false
+    document.getElementById('accept').onclick = () => {
+      localStorage.setItem(KEY, JSON.stringify({ decision: 'all', analytics: true, policy: 'policy-2026-10-12', at: new Date().toISOString() }))
+      box.hidden = true
+      arm()
+    }
+    document.body.addEventListener('click', (event) => {
+      const a = event.target.closest('[data-door]')
+      if (!a) return
+      goal('launch_' + a.dataset.door, { door: a.dataset.door, from: mark })
+    })
+  </script>
+</body>
+</html>
