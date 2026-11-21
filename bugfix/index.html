@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Баг Фикс для Бизнеса</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0B0B0D">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <style>
+    :root {
+      --bg: #0b0b0d;
+      --text: #f2f2f4;
+      --text-sec: #b8b9c0;
+      --blue: #2563eb;
+      --blue-text: #6aa5ff;
+      --glass: rgba(20, 20, 24, 0.72);
+      --edge: color-mix(in srgb, var(--blue-text) 45%, transparent);
+      --ink: #1c1b18;
+      --sheet: #fff;
+      --soft: #eff1f6;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--text); }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+    .page {
+      width: min(460px, 100%);
+      margin: 0 auto;
+      padding: max(36px, env(safe-area-inset-top)) 18px max(28px, env(safe-area-inset-bottom));
+    }
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: clamp(34px, 9vw, 44px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+    .lead {
+      margin: 12px 0 28px;
+      text-align: center;
+      color: var(--text-sec);
+      font-size: clamp(18px, 5vw, 22px);
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .stack { display: flex; flex-direction: column; gap: 10px; }
+    .plaque {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      min-height: 84px;
+      padding: 16px 16px 16px 20px;
+      border: 2px solid var(--edge);
+      border-radius: 16px;
+      background: var(--glass);
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .plaque:active { transform: scale(0.985); }
+    .plaque:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .plaque b {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+    .glyphs { display: flex; align-items: center; gap: 14px; flex: none; }
+    .glyphs svg { width: 36px; height: 36px; display: block; }
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal[hidden] { display: none; }
+    .scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); }
+    .panel {
+      position: relative;
+      width: 100%;
+      max-height: 92dvh;
+      overflow: auto;
+      background: var(--sheet);
+      color: var(--ink);
+      border-radius: 18px 18px 0 0;
+      padding: 22px 20px max(20px, env(safe-area-inset-bottom));
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+    }
+    .x {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--soft);
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+    .x svg { width: 22px; height: 22px; }
+    .x:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .modal-glyphs {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 22px;
+      margin: 28px 48px 18px;
+    }
+    .modal-glyphs svg { width: 48px; height: 48px; display: block; }
+    .panel h2 {
+      margin: 0 8px 22px;
+      text-align: center;
+      font-size: clamp(26px, 7vw, 34px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+    }
+    .acts { display: flex; flex-direction: column; gap: 8px; }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 52px;
+      border: 0;
+      border-radius: 16px;
+      font: inherit;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .btn-copy { background: var(--blue); color: #fff; }
+    .btn-dl { background: var(--soft); color: var(--ink); }
+    .md {
+      border-radius: 4px;
+      padding: 2px 6px;
+      background: var(--ink);
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+    }
+    .note {
+      min-height: 1.2em;
+      margin: 8px 0 0;
+      text-align: center;
+      font-size: 13px;
+      color: #d92d20;
+    }
+    .note:empty { display: none; }
+    @media (min-width: 760px) {
+      .modal { align-items: center; padding: 24px; }
+      .panel {
+        max-width: 440px;
+        border-radius: 20px;
+        padding: 28px 24px 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>Баг Фикс<br>для Бизнеса</h1>
+    <p class="lead">забрать чит-код</p>
+    <div class="stack" id="stack"></div>
+  </main>
+
+  <div class="modal" id="modal" hidden>
+    <div class="scrim" data-close></div>
+    <section class="panel" role="dialog" aria-modal="true" aria-labelledby="reel-title">
+      <button type="button" class="x" id="close" aria-label="Закрыть">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="modal-glyphs" id="modal-glyphs"></div>
+      <h2 id="reel-title"></h2>
+      <div class="acts">
+        <button type="button" class="btn btn-copy" id="copy">Скопировать</button>
+        <button type="button" class="btn btn-dl" id="download"><span class="lbl">Скачать</span><span class="md">MD</span></button>
+      </div>
+      <p class="note" id="note"></p>
+    </section>
+  </div>
+
+  <svg xmlns="http://www.w3.org/2000/svg" hidden aria-hidden="true">
+    <symbol id="i-chart" viewBox="0 0 48 48">
+      <path fill="currentColor" d="M5 42V26h10v16H5zm14 0V12h10v30H19zm14 0V18h10v24H33z"/>
+    </symbol>
+    <symbol id="i-person" viewBox="0 0 48 48">
+      <path fill="currentColor" d="M24 4a9 9 0 1 1 0 18 9 9 0 0 1 0-18zM7 44c1.4-9 7.6-14 17-14s15.6 5 17 14H7z"/>
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 48 48">
+      <path fill="currentColor" fill-rule="evenodd" d="M24 4a20 20 0 1 0 0 40 20 20 0 0 0 0-40zm0 6a14 14 0 1 1 0 28 14 14 0 0 1 0-28z"/>
+      <path fill="currentColor" d="M22 13h4v13.2l8 4.6-2.1 3.6L22 28.4V13z"/>
+    </symbol>
+  </svg>
+
+  <script>
+    const SERIES = [
+      {
+        id: 'dashboards',
+        name: 'Дашборды',
+        reel: 'Дашборды не стратегия',
+        file: 'дашборды.md',
+        icons: ['chart', 'person', 'clock'],
+        md: [
+          '# Дашборды не стратегия',
+          '',
+          'У каждого графика назвать решение, ради которого его собрали.',
+          '',
+          'Назвать человека и как часто он принимает решение на базе метрики.',
+          '',
+          'Три ответа: что сделать сегодня, кто отвечает и как часто.',
+          '',
+          'Сначала решение, потом данные, потом технология.',
+          '',
+        ].join('\n'),
+      },
+    ]
+
+    const stack = document.getElementById('stack')
+    const modal = document.getElementById('modal')
+    const modalGlyphs = document.getElementById('modal-glyphs')
+    const title = document.getElementById('reel-title')
+    const note = document.getElementById('note')
+    const copyBtn = document.getElementById('copy')
+    const downloadBtn = document.getElementById('download')
+    const downloadLabel = downloadBtn.querySelector('.lbl')
+    let current = null
+    let copyTimer = 0
+    let downloadTimer = 0
+
+    function glyph(id) {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+      svg.setAttribute('viewBox', '0 0 48 48')
+      svg.setAttribute('aria-hidden', 'true')
+      const use = document.createElementNS('http://www.w3.org/2000/svg', 'use')
+      use.setAttribute('href', '#i-' + id)
+      svg.appendChild(use)
+      return svg
+    }
+
+    function paintGlyphs(host, icons) {
+      host.replaceChildren()
+      icons.forEach((id) => host.appendChild(glyph(id)))
+    }
+
+    SERIES.forEach((item) => {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = 'plaque'
+      button.dataset.id = item.id
+      const name = document.createElement('b')
+      name.textContent = item.name
+      const icons = document.createElement('span')
+      icons.className = 'glyphs'
+      paintGlyphs(icons, item.icons)
+      button.append(name, icons)
+      button.addEventListener('click', () => open(item))
+      stack.appendChild(button)
+    })
+
+    function open(item) {
+      current = item
+      paintGlyphs(modalGlyphs, item.icons)
+      title.textContent = item.reel
+      note.textContent = ''
+      copyBtn.textContent = 'Скопировать'
+      downloadLabel.textContent = 'Скачать'
+      modal.hidden = false
+      document.body.style.overflow = 'hidden'
+      document.getElementById('close').focus()
+    }
+
+    function close() {
+      modal.hidden = true
+      document.body.style.overflow = ''
+      const back = stack.querySelector('[data-id="' + (current && current.id) + '"]')
+      if (back) back.focus()
+    }
+
+    function copyBySelect(text) {
+      const area = document.createElement('textarea')
+      area.value = text
+      area.setAttribute('readonly', '')
+      area.style.position = 'fixed'
+      area.style.top = '0'
+      area.style.left = '0'
+      area.style.opacity = '0'
+      document.body.appendChild(area)
+      area.focus()
+      area.select()
+      area.setSelectionRange(0, text.length)
+      let ok = false
+      try { ok = document.execCommand('copy') } catch { ok = false }
+      area.remove()
+      return ok
+    }
+
+    async function copyText() {
+      if (!current) return
+      note.textContent = ''
+      let ok = false
+      try {
+        await navigator.clipboard.writeText(current.md)
+        ok = true
+      } catch { ok = false }
+      if (!ok) ok = copyBySelect(current.md)
+      if (!ok) {
+        note.textContent = 'Браузер не дал скопировать. Скачайте файл.'
+        return
+      }
+      copyBtn.textContent = 'Скопировано'
+      clearTimeout(copyTimer)
+      copyTimer = setTimeout(() => { copyBtn.textContent = 'Скопировать' }, 1600)
+    }
+
+    function downloadFile() {
+      if (!current) return
+      const blob = new Blob([current.md], { type: 'text/markdown;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = current.file
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+      downloadLabel.textContent = 'Готово'
+      clearTimeout(downloadTimer)
+      downloadTimer = setTimeout(() => { downloadLabel.textContent = 'Скачать' }, 1600)
+    }
+
+    copyBtn.addEventListener('click', copyText)
+    downloadBtn.addEventListener('click', downloadFile)
+    modal.addEventListener('click', (event) => {
+      if (event.target.closest('[data-close], #close')) close()
+    })
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !modal.hidden) close()
+    })
+  </script>
+</body>
+</html>
