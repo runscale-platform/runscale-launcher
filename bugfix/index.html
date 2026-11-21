@@ -95,11 +95,77 @@
       pointer-events: none;
     }
     .plaque:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+    .plaque-copy { flex: 1; min-width: 0; }
+    .plaque-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
     .plaque b {
-      font-size: 22px;
-      font-weight: 800;
+      font-size: 20px;
+      font-weight: 600;
       letter-spacing: -0.02em;
-      line-height: 1.15;
+      line-height: 1.2;
+    }
+    .when {
+      flex: none;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--ink) 16%, transparent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      line-height: 1.3;
+    }
+    .doors { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
+    .door {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 16px 16px 18px;
+      border-radius: 16px;
+      color: var(--text);
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .door--fill { background: var(--action); }
+    .door--line { background: rgba(20, 20, 24, 0.72); border: 2px solid color-mix(in srgb, var(--action-text) 45%, transparent); }
+    .door-body { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+    .door-label { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+    .door--line .door-label { color: var(--action-text); }
+    .door-name { font-size: 21px; font-weight: 700; line-height: 1.22; }
+    .door-badge { margin-top: 4px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; line-height: 1.3; }
+    .door--fill .door-badge { background: rgba(255, 255, 255, 0.12); color: var(--text); }
+    .door--line .door-badge { background: color-mix(in srgb, var(--action) 14%, #fff); color: var(--action); }
+    .door-go { flex: none; width: 22px; height: 22px; }
+    .door--line .door-go { color: var(--action-text); }
+    .clear {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) 18px;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      margin-top: 18px;
+      text-align: left;
+      border: 1px solid #4a4a4a;
+      border-radius: 16px;
+      background: #2e2e2e;
+      color: #f2f2f2;
+      padding: 14px 16px;
+      font: inherit;
+      cursor: pointer;
+    }
+    .clear-ic { width: 44px; height: 44px; border-radius: 16px; background: #383838; display: grid; place-items: center; color: #6aa5ff; }
+    .clear-ic svg, .clear-go { width: 22px; height: 22px; }
+    .clear-go { color: #6aa5ff; }
+    .clear b { display: block; font-size: 15px; font-weight: 700; line-height: 1.3; }
+    .clear small { display: block; margin-top: 2px; font-size: 13px; line-height: 1.35; color: #a8a8a8; }
+    .docs-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .docs-list a {
+      display: block;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: var(--surface-2);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 600;
     }
     .glyphs { display: flex; align-items: center; gap: 6px; flex: none; color: var(--ink); }
     .glyphs svg { width: 32px; height: 32px; display: block; overflow: visible; }
@@ -210,6 +276,25 @@
     <h1>Баг Фикс<br>для Бизнеса</h1>
     <p class="lead">забрать чит-код</p>
     <div class="stack" id="stack"></div>
+    <nav class="doors" aria-label="Как начать">
+      <a class="door door--fill" data-door="focus">
+        <span class="door-body"><span class="door-label">Ранскеил Фокус</span><span class="door-name">Срочная помощь владельцу</span><span class="door-badge">Стартовый багфикс</span></span>
+        <svg class="door-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </a>
+      <a class="door door--line" data-door="ultra">
+        <span class="door-body"><span class="door-label">Ранскеил Ультра</span><span class="door-name">Бизнес-машина</span><span class="door-badge">Буткемп</span></span>
+        <svg class="door-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </a>
+      <a class="door door--line" data-door="track">
+        <span class="door-body"><span class="door-label">Ранскеил Трек</span><span class="door-name">Расти каждый день</span><span class="door-badge">Бесплатно</span></span>
+        <svg class="door-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </a>
+      <button type="button" class="clear" id="docs-open">
+        <span class="clear-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4.2 2.7 7.1 7 8.5 4.3-1.4 7-4.3 7-8.5V6l-7-3z"/><path d="m9 12 2 2 4-4"/></svg></span>
+        <span><b>Всё прозрачно.</b><small>Соглашение о конфиденциальности, оферта, политика данных</small></span>
+        <svg class="clear-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+    </nav>
   </main>
 
   <div class="modal" id="modal" hidden>
@@ -225,6 +310,24 @@
         <button type="button" class="btn btn-dl" id="download"><span class="lbl">Скачать</span><span class="md">MD</span></button>
       </div>
       <p class="note" id="note"></p>
+    </section>
+  </div>
+
+  <div class="modal" id="docs" hidden>
+    <div class="scrim" data-close></div>
+    <section class="panel" role="dialog" aria-modal="true" aria-labelledby="docs-title">
+      <button type="button" class="x" id="docs-close" aria-label="Закрыть">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <h2 id="docs-title" style="margin:36px 0 16px;text-align:center;font-size:28px;font-weight:800;letter-spacing:-0.03em">Всё прозрачно.</h2>
+      <div class="docs-list">
+        <a href="https://ultra.runscale.ru/terms" target="_blank" rel="noopener noreferrer">Условия использования</a>
+        <a href="https://ultra.runscale.ru/confidentiality" target="_blank" rel="noopener noreferrer">Соглашение о конфиденциальности</a>
+        <a href="https://ultra.runscale.ru/policy" target="_blank" rel="noopener noreferrer">Политика обработки данных</a>
+        <a href="https://ultra.runscale.ru/consent" target="_blank" rel="noopener noreferrer">Согласие на обработку данных</a>
+        <a href="https://ultra.runscale.ru/offer" target="_blank" rel="noopener noreferrer">Оферта Ранскеил Фокус</a>
+        <a href="mailto:info@runscale.ru">info@runscale.ru</a>
+      </div>
     </section>
   </div>
 
@@ -255,7 +358,8 @@
     const ICONS = {
       chart: [[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],[1,8],[1,9],[1,10],[1,11],[1,12],[1,13],[1,14],[2,14],[3,11],[3,12],[3,13],[3,14],[4,11],[4,12],[4,13],[4,14],[5,14],[6,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,8],[7,9],[7,10],[7,11],[7,12],[7,13],[7,14],[8,14],[9,5],[9,6],[9,7],[9,8],[9,9],[9,10],[9,11],[9,12],[9,13],[9,14],[10,5],[10,6],[10,7],[10,8],[10,9],[10,10],[10,11],[10,12],[10,13],[10,14],[11,14],[12,2],[12,3],[12,4],[12,5],[12,6],[12,7],[12,8],[12,9],[12,10],[12,11],[12,12],[12,13],[12,14],[13,2],[13,3],[13,4],[13,5],[13,6],[13,7],[13,8],[13,9],[13,10],[13,11],[13,12],[13,13],[13,14],[14,14],[15,14]],
       person: [[4,10],[4,11],[4,12],[4,13],[4,14],[5,9],[5,14],[6,3],[6,4],[6,5],[6,8],[6,9],[6,14],[7,2],[7,6],[7,14],[8,2],[8,6],[8,14],[9,2],[9,6],[9,14],[10,3],[10,4],[10,5],[10,8],[10,9],[10,14],[11,9],[11,14],[12,10],[12,11],[12,12],[12,13],[12,14]],
-      answers: [[3,4],[3,5],[3,8],[3,9],[3,12],[3,13],[4,4],[4,5],[4,8],[4,9],[4,12],[4,13],[7,4],[7,5],[7,8],[7,9],[7,12],[7,13],[8,4],[8,5],[8,8],[8,9],[8,12],[8,13],[9,4],[9,5],[9,8],[9,9],[9,12],[9,13],[10,4],[10,5],[10,8],[10,9],[10,12],[10,13],[11,4],[11,5],[11,8],[11,9],[11,12],[11,13],[12,4],[12,5],[12,8],[12,9],[12,12],[12,13],[13,4],[13,5],[13,8],[13,9],[13,12],[13,13]]
+      answers: [[3,4],[3,5],[3,8],[3,9],[3,12],[3,13],[4,4],[4,5],[4,8],[4,9],[4,12],[4,13],[7,4],[7,5],[7,8],[7,9],[7,12],[7,13],[8,4],[8,5],[8,8],[8,9],[8,12],[8,13],[9,4],[9,5],[9,8],[9,9],[9,12],[9,13],[10,4],[10,5],[10,8],[10,9],[10,12],[10,13],[11,4],[11,5],[11,8],[11,9],[11,12],[11,13],[12,4],[12,5],[12,8],[12,9],[12,12],[12,13],[13,4],[13,5],[13,8],[13,9],[13,12],[13,13]],
+      x: [[3,3],[4,3],[3,13],[4,13],[4,4],[5,4],[4,12],[5,12],[5,5],[6,5],[5,11],[6,11],[6,6],[7,6],[6,10],[7,10],[7,7],[8,7],[7,9],[8,9],[8,8],[9,8],[9,9],[10,9],[9,7],[10,7],[10,10],[11,10],[10,6],[11,6],[11,11],[12,11],[11,5],[12,5],[12,12],[13,12],[12,4],[13,4],[13,13],[14,13],[13,3],[14,3]]
     }
 
     const SERIES = [
@@ -286,7 +390,8 @@
         word: 'КАССА',
         hue: '#FF0080',
         ink: '#ffffff',
-        icons: ['chart', 'person', 'answers'],
+        when: 'ДЕК 26',
+        icons: ['x'],
       },
       {
         id: 'sklad',
@@ -294,7 +399,8 @@
         word: 'СКЛАД',
         hue: '#C5F946',
         ink: '#1a1a1a',
-        icons: ['chart', 'person', 'answers'],
+        when: 'ДЕК 26',
+        icons: ['x'],
       },
     ]
 
@@ -447,12 +553,24 @@
       button.dataset.id = item.id
       button.style.setProperty('--hue', item.hue)
       button.style.setProperty('--ink', item.ink)
+      const copy = document.createElement('span')
+      copy.className = 'plaque-copy'
+      const line = document.createElement('span')
+      line.className = 'plaque-line'
       const name = document.createElement('b')
       name.textContent = item.name
+      line.appendChild(name)
+      if (item.when) {
+        const badge = document.createElement('span')
+        badge.className = 'when'
+        badge.textContent = item.when
+        line.appendChild(badge)
+      }
+      copy.appendChild(line)
       const icons = document.createElement('span')
       icons.className = 'glyphs'
       mountPlaque(icons, item)
-      button.append(name, icons)
+      button.append(copy, icons)
       button.addEventListener('click', function () { open(item) })
       stack.appendChild(button)
     })
@@ -477,9 +595,10 @@
       const gap = GAP
       const row = item.icons.length * N + Math.max(0, item.icons.length - 1) * gap
       const word = wordCells(item.word)
-      const ox = Math.max(0, Math.round((row - word.cols) / 2))
+      const cols = Math.max(row, word.cols)
+      const iconOx = Math.max(0, Math.round((cols - row) / 2))
+      const ox = Math.max(0, Math.round((cols - word.cols) / 2))
       const oy = N + gap
-      const cols = Math.max(row, ox + word.cols)
       const rows = oy + word.rows
       const w = (cols - 1) * STEP + 2 * R
       const h = (rows - 1) * STEP + 2 * R
@@ -489,7 +608,7 @@
       svg.style.height = h + 'px'
       svg.setAttribute('aria-hidden', 'true')
       const actors = item.icons.map(function (name, i) {
-        const x0 = i * (N + gap)
+        const x0 = iconOx + i * (N + gap)
         const dots = ICONS[name].map(function (p) {
           const c = circleAt(x0 + p[0], p[1])
           svg.appendChild(c)
@@ -625,8 +744,31 @@
     modal.addEventListener('click', function (event) {
       if (event.target.closest('[data-close], #close')) close()
     })
+    const docs = document.getElementById('docs')
+    function setDocs(open) {
+      docs.hidden = !open
+      document.body.style.overflow = open || !modal.hidden ? 'hidden' : ''
+    }
+    document.getElementById('docs-open').addEventListener('click', function () { setDocs(true) })
+    docs.addEventListener('click', function (event) {
+      if (event.target.closest('[data-close], #docs-close')) setDocs(false)
+    })
+    const markRaw = (new URLSearchParams(location.search).get('from') || '').trim().toLowerCase()
+    const mark = /^[a-z0-9][a-z0-9-]{0,63}$/.test(markRaw) ? markRaw : 'instagram-runscale'
+    const doorHref = {
+      focus: 'https://ultra.runscale.ru/?from=' + mark + '&product=focus',
+      ultra: 'https://ultra.runscale.ru/?from=' + mark + '&product=ultra',
+      track: 'https://gderost.ru/?from=launch',
+    }
+    document.querySelectorAll('[data-door]').forEach(function (a) {
+      a.href = doorHref[a.dataset.door]
+      a.target = '_blank'
+      a.rel = 'noopener noreferrer'
+    })
     document.addEventListener('keydown', function (event) {
-      if (event.key === 'Escape' && !modal.hidden) close()
+      if (event.key !== 'Escape') return
+      if (!docs.hidden) setDocs(false)
+      else if (!modal.hidden) close()
     })
   </script>
 </body>
