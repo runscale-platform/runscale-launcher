@@ -173,6 +173,8 @@
       color: var(--hue);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -1px 0 rgba(0, 0, 0, 0.28);
     }
+    .copy-mark { display: block; flex: none; }
+    .copy-mark[hidden] { display: none; }
     .btn-dl {
       background: color-mix(in srgb, var(--ink) 14%, transparent);
       color: var(--ink);
@@ -219,7 +221,7 @@
       <div class="stage" id="stage"></div>
       <h2 id="reel-title" class="sr"></h2>
       <div class="acts">
-        <button type="button" class="btn btn-copy" id="copy">Скопировать</button>
+        <button type="button" class="btn btn-copy" id="copy"><span id="copy-label">Забрать читкод</span><svg class="copy-mark" id="copy-mark" viewBox="0 0 23 17" width="23" height="17" hidden aria-hidden="true"></svg></button>
         <button type="button" class="btn btn-dl" id="download"><span class="lbl">Скачать</span><span class="md">MD</span></button>
       </div>
       <p class="note" id="note"></p>
@@ -518,7 +520,7 @@
       panel.style.setProperty('--ink', item.ink)
       acts.hidden = !item.md
       note.textContent = ''
-      copyBtn.textContent = 'Скопировать'
+      resetCopy()
       downloadLabel.textContent = 'Скачать'
       modal.hidden = false
       document.body.style.overflow = 'hidden'
@@ -549,6 +551,40 @@
       return ok
     }
 
+    const CHECK = [[0,3],[0,4],[1,4],[1,5],[2,4],[2,5],[3,3],[3,4],[4,2],[4,3],[5,1],[5,2],[6,0],[6,1],[7,0]]
+    let checkFrame = 0
+
+    function buildCheck() {
+      const svg = document.getElementById('copy-mark')
+      if (svg.childElementCount) return
+      CHECK.forEach(function (p) { svg.appendChild(circleAt(p[0], p[1])) })
+    }
+
+    function resetCopy() {
+      checkFrame++
+      document.getElementById('copy-label').textContent = 'Забрать читкод'
+      const mark = document.getElementById('copy-mark')
+      mark.hidden = true
+      ;[...mark.querySelectorAll('circle')].forEach(function (c) { c.setAttribute('fill', 'transparent') })
+    }
+
+    function playCheck() {
+      buildCheck()
+      const mark = document.getElementById('copy-mark')
+      const dots = [...mark.querySelectorAll('circle')]
+      dots.forEach(function (c) { c.setAttribute('fill', 'transparent') })
+      mark.hidden = false
+      const token = ++checkFrame
+      const t0 = performance.now()
+      function frame(now) {
+        if (token !== checkFrame) return
+        const n = Math.min(dots.length, Math.floor((now - t0) / 32) + 1)
+        dots.forEach(function (c, i) { c.setAttribute('fill', i < n ? 'currentColor' : 'transparent') })
+        if (n < dots.length) requestAnimationFrame(frame)
+      }
+      requestAnimationFrame(frame)
+    }
+
     async function copyText() {
       if (!current || !current.md) return
       note.textContent = ''
@@ -562,9 +598,10 @@
         note.textContent = 'Браузер не дал скопировать. Скачайте файл.'
         return
       }
-      copyBtn.textContent = 'Скопировано'
+      document.getElementById('copy-label').textContent = 'Скопировано'
+      playCheck()
       clearTimeout(copyTimer)
-      copyTimer = setTimeout(function () { copyBtn.textContent = 'Скопировать' }, 1600)
+      copyTimer = setTimeout(resetCopy, 1800)
     }
 
     function downloadFile() {
