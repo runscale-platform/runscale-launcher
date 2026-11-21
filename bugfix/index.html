@@ -198,7 +198,9 @@
     }
     .glyphs { display: flex; align-items: center; gap: 6px; flex: none; color: var(--ink); }
     .glyphs svg { width: 32px; height: 32px; display: block; overflow: visible; }
-    .stage { display: flex; justify-content: center; margin: 28px 0 18px; color: var(--ink, var(--text)); }
+    .stage { display: flex; justify-content: center; margin: 28px 0 14px; color: var(--ink, var(--text)); }
+    .sheet-when { display: flex; justify-content: center; margin: 0 0 18px; }
+    .sheet-when[hidden] { display: none; }
     .stage svg { display: block; overflow: visible; }
     .modal {
       position: fixed;
@@ -335,6 +337,7 @@
       </button>
       <div class="stage" id="stage"></div>
       <h2 id="reel-title" class="sr"></h2>
+      <div class="sheet-when" id="sheet-when" hidden><span class="when" id="sheet-when-label"></span></div>
       <div class="acts">
         <button type="button" class="btn btn-copy" id="copy"><span id="copy-label">Забрать читкод</span><svg class="copy-mark" id="copy-mark" viewBox="0 0 23 17" width="23" height="17" hidden aria-hidden="true"></svg></button>
         <button type="button" class="btn btn-dl" id="download"><span class="lbl">Скачать</span><span class="md">MD</span></button>
@@ -668,6 +671,9 @@
       panel.style.setProperty('--hue', item.hue)
       panel.style.setProperty('--ink', item.ink)
       acts.hidden = !item.md
+      const sheetWhen = document.getElementById('sheet-when')
+      sheetWhen.hidden = !item.when
+      document.getElementById('sheet-when-label').textContent = item.when || ''
       note.textContent = ''
       resetCopy()
       downloadLabel.textContent = 'Скачать'
