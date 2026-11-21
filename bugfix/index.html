@@ -103,7 +103,8 @@
     }
     .glyphs { display: flex; align-items: center; gap: 6px; flex: none; color: var(--ink); }
     .glyphs svg { width: 32px; height: 32px; display: block; overflow: visible; }
-    .modal-glyphs svg { display: block; overflow: visible; }
+    .stage { margin: 40px 4px 16px; color: var(--ink, var(--text)); }
+    .stage svg { width: 100%; height: auto; display: block; overflow: visible; }
     .modal {
       position: fixed;
       inset: 0;
@@ -140,22 +141,6 @@
     }
     .x svg { width: 22px; height: 22px; }
     .x:focus-visible, .btn:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
-    .modal-glyphs {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 14px;
-      margin: 48px 8px 18px;
-      color: var(--ink, var(--text));
-    }
-    .modal-glyphs svg { width: 52px; height: 52px; }
-    .panel h2 {
-      margin: 0 0 22px;
-      display: flex;
-      justify-content: center;
-      color: var(--ink, var(--text));
-    }
-    .panel h2 svg { display: block; overflow: visible; max-width: 100%; height: auto; }
     .sr {
       position: absolute;
       width: 1px;
@@ -231,8 +216,8 @@
       <button type="button" class="x" id="close" aria-label="Закрыть">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
-      <div class="modal-glyphs" id="modal-glyphs"></div>
-      <h2 id="reel-title"><span class="sr" id="reel-name"></span><span id="reel-word"></span></h2>
+      <div class="stage" id="stage"></div>
+      <h2 id="reel-title" class="sr"></h2>
       <div class="acts">
         <button type="button" class="btn btn-copy" id="copy">Скопировать</button>
         <button type="button" class="btn btn-dl" id="download"><span class="lbl">Скачать</span><span class="md">MD</span></button>
@@ -245,7 +230,6 @@
     const N = 17
     const STEP = 3
     const R = 1
-    const CYCLE = 2000
     const STILL = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const LETTERS = {
       'А': ['111', '101', '111', '101', '101'],
@@ -333,73 +317,124 @@
 
     const NS = 'http://www.w3.org/2000/svg'
     const SIZE = (N - 1) * STEP + 2 * R
+    const GAP = 2
+    const PAUSE = 2000
+    const BUILD = 640
+    const PERIOD = PAUSE + BUILD
+    const ALGOS = 12
     const plays = []
-    const WORD_STEP = 7
-    const WORD_R = 2
+    const CLAIM = new Map()
+    const USED = new Set()
 
-    function circle(x, y) {
+    function hash(str) {
+      let h = 2166136261
+      for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 16777619)
+      return h >>> 0
+    }
+
+    function claim(key) {
+      if (CLAIM.has(key)) return CLAIM.get(key)
+      let algo = hash(key) % ALGOS
+      let n = 0
+      while (USED.has(algo) && n < ALGOS) {
+        algo = (algo + 1) % ALGOS
+        n++
+      }
+      USED.add(algo)
+      const rec = { algo: algo, offset: hash(key + ':o') % PERIOD }
+      CLAIM.set(key, rec)
+      return rec
+    }
+
+    function orderOf(algo, cells, cycle, key) {
+      const cx = 8
+      const cy = 8
+      const dist = function (p) { return (p[0] - cx) * (p[0] - cx) + (p[1] - cy) * (p[1] - cy) }
+      let list
+      if (algo === 0) list = cells.slice().sort(function (a, b) { return a[1] - b[1] || a[0] - b[0] })
+      else if (algo === 1) list = cells.slice().sort(function (a, b) { return a[1] - b[1] || b[0] - a[0] })
+      else if (algo === 2) list = cells.slice().sort(function (a, b) { return a[0] - b[0] || a[1] - b[1] })
+      else if (algo === 3) list = cells.slice().sort(function (a, b) { return b[0] - a[0] || b[1] - a[1] })
+      else if (algo === 4) list = cells.slice().sort(function (a, b) { return (a[0] + a[1]) - (b[0] + b[1]) || a[0] - b[0] })
+      else if (algo === 5) list = cells.slice().sort(function (a, b) { return (b[0] + b[1]) - (a[0] + a[1]) || b[1] - a[1] })
+      else if (algo === 6) list = cells.slice().sort(function (a, b) { return dist(a) - dist(b) || a[0] - b[0] })
+      else if (algo === 7) list = cells.slice().sort(function (a, b) { return dist(b) - dist(a) || b[0] - a[0] })
+      else if (algo === 8) list = cells.slice().sort(function (a, b) { return Math.atan2(a[1] - cy, a[0] - cx) - Math.atan2(b[1] - cy, b[0] - cx) })
+      else if (algo === 9) list = cells.slice().sort(function (a, b) { return Math.atan2(b[1] - cy, b[0] - cx) - Math.atan2(a[1] - cy, a[0] - cx) })
+      else if (algo === 10) list = cells.slice().sort(function (a, b) { return (a[0] ^ a[1]) - (b[0] ^ b[1]) || a[1] - b[1] })
+      else list = shuffle(cells, hash(key + ':' + cycle))
+      const salt = cycle * 17 + (hash(key) % 97)
+      const shift = list.length ? salt % list.length : 0
+      const cut = list.slice(shift).concat(list.slice(0, shift))
+      if (salt % 2) cut.reverse()
+      return cut
+    }
+
+    function circleAt(gx, gy) {
       const c = document.createElementNS(NS, 'circle')
-      c.setAttribute('cx', x * STEP + R)
-      c.setAttribute('cy', y * STEP + R)
+      c.setAttribute('cx', gx * STEP + R)
+      c.setAttribute('cy', gy * STEP + R)
       c.setAttribute('r', R)
       c.setAttribute('fill', 'transparent')
       return c
     }
 
-    function mountIcons(host, names, seed) {
+    function actorOf(key, cells, dots) {
+      return { key: key, cells: cells, dots: dots, cycle: -1, rank: {} }
+    }
+
+    function mountPlaque(host, item) {
       host.replaceChildren()
-      const icons = names.map(function (name, i) {
-        const order = shuffle(ICONS[name], seed + i * 97)
+      const actors = item.icons.map(function (name, i) {
+        const cells = ICONS[name]
         const svg = document.createElementNS(NS, 'svg')
         svg.setAttribute('viewBox', '0 0 ' + SIZE + ' ' + SIZE)
         svg.setAttribute('width', SIZE)
         svg.setAttribute('height', SIZE)
         svg.setAttribute('aria-hidden', 'true')
-        const dots = order.map(function (p) {
-          const c = circle(p[0], p[1])
+        const dots = cells.map(function (p) {
+          const c = circleAt(p[0], p[1])
           svg.appendChild(c)
-          return c
+          return { el: c, at: p[0] + ',' + p[1] }
         })
         host.appendChild(svg)
-        return { order: order, dots: dots }
+        return actorOf(item.id + ':' + name + ':' + i, cells, dots)
       })
-      const play = { icons: icons }
+      const play = { actors: actors }
       plays.push(play)
-      paint(play, 0)
       return play
     }
 
-    function countAt(elapsed, i, total) {
-      if (STILL) return total
-      const t = elapsed % CYCLE
-      const start = i * 200
-      const build = 360
-      if (t < start) return 0
-      if (t < start + build) return Math.max(1, Math.round(total * (t - start) / build))
-      if (t < 1500) return total
-      return Math.max(0, Math.round(total * (1 - (t - 1500) / 500)))
-    }
-
-    function paint(play, elapsed) {
-      play.icons.forEach(function (icon, i) {
-        const n = countAt(elapsed, i, icon.order.length)
-        icon.dots.forEach(function (el, k) {
-          el.setAttribute('fill', k < n ? 'currentColor' : 'transparent')
+    function paint(play, now) {
+      play.actors.forEach(function (actor) {
+        const rec = claim(actor.key)
+        const shifted = now + rec.offset
+        const cycle = Math.floor(shifted / PERIOD)
+        const local = shifted - cycle * PERIOD
+        if (actor.cycle !== cycle) {
+          const order = orderOf(rec.algo, actor.cells, cycle, actor.key)
+          actor.rank = {}
+          order.forEach(function (p, i) { actor.rank[p[0] + ',' + p[1]] = i })
+          actor.cycle = cycle
+        }
+        const total = actor.cells.length
+        let n = total
+        if (!STILL && local >= PAUSE) n = Math.round(total * (local - PAUSE) / BUILD)
+        actor.dots.forEach(function (d) {
+          d.el.setAttribute('fill', actor.rank[d.at] < n ? 'currentColor' : 'transparent')
         })
       })
     }
 
-    const T0 = performance.now()
     function tick(now) {
-      const elapsed = now - T0
-      plays.forEach(function (play) { paint(play, elapsed) })
+      plays.forEach(function (play) { paint(play, now) })
       if (!STILL) requestAnimationFrame(tick)
     }
     requestAnimationFrame(tick)
 
     const stack = document.getElementById('stack')
     const modal = document.getElementById('modal')
-    const modalGlyphs = document.getElementById('modal-glyphs')
+    const stage = document.getElementById('stage')
     const panel = document.querySelector('.panel')
     const acts = document.querySelector('.acts')
     const note = document.getElementById('note')
@@ -422,7 +457,7 @@
       name.textContent = item.name
       const icons = document.createElement('span')
       icons.className = 'glyphs'
-      mountIcons(icons, item.icons, 20261120)
+      mountPlaque(icons, item)
       button.append(name, icons)
       button.addEventListener('click', function () { open(item) })
       stack.appendChild(button)
@@ -443,26 +478,39 @@
       return { cells: cells, cols: Math.max(1, x - 1), rows: 5 }
     }
 
-    function paintWord(text) {
-      const host = document.getElementById('reel-word')
+    function mountStage(host, item) {
       host.replaceChildren()
-      const fig = wordCells(text)
-      const w = (fig.cols - 1) * WORD_STEP + 2 * WORD_R
-      const h = (fig.rows - 1) * WORD_STEP + 2 * WORD_R
+      const gap = GAP
+      const row = item.icons.length * N + Math.max(0, item.icons.length - 1) * gap
+      const word = wordCells(item.word)
+      const ox = Math.max(0, Math.round((row - word.cols) / 2))
+      const oy = N + gap
+      const cols = Math.max(row, ox + word.cols)
+      const rows = oy + word.rows
+      const w = (cols - 1) * STEP + 2 * R
+      const h = (rows - 1) * STEP + 2 * R
       const svg = document.createElementNS(NS, 'svg')
       svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h)
-      svg.setAttribute('width', w)
-      svg.setAttribute('height', h)
       svg.setAttribute('aria-hidden', 'true')
-      fig.cells.forEach(function (p) {
-        const c = document.createElementNS(NS, 'circle')
-        c.setAttribute('cx', p[0] * WORD_STEP + WORD_R)
-        c.setAttribute('cy', p[1] * WORD_STEP + WORD_R)
-        c.setAttribute('r', WORD_R)
+      const actors = item.icons.map(function (name, i) {
+        const cells = ICONS[name]
+        const x0 = i * (N + gap)
+        const dots = cells.map(function (p) {
+          const c = circleAt(x0 + p[0], p[1])
+          svg.appendChild(c)
+          return { el: c, at: p[0] + ',' + p[1] }
+        })
+        return actorOf(item.id + ':' + name + ':' + i, cells, dots)
+      })
+      word.cells.forEach(function (p) {
+        const c = circleAt(ox + p[0], oy + p[1])
         c.setAttribute('fill', 'currentColor')
         svg.appendChild(c)
       })
       host.appendChild(svg)
+      const play = { actors: actors }
+      plays.push(play)
+      return play
     }
 
     function open(item) {
@@ -471,9 +519,8 @@
         const at = plays.indexOf(modalPlay)
         if (at >= 0) plays.splice(at, 1)
       }
-      modalPlay = mountIcons(modalGlyphs, item.icons, 20261120)
-      paintWord(item.word)
-      document.getElementById('reel-name').textContent = item.name
+      modalPlay = mountStage(stage, item)
+      document.getElementById('reel-title').textContent = item.name
       panel.style.setProperty('--hue', item.hue)
       panel.style.setProperty('--ink', item.ink)
       acts.hidden = !item.md
