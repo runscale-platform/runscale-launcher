@@ -353,7 +353,7 @@
       <h2 id="reel-title" class="sr"></h2>
       <div class="sheet-when" id="sheet-when" hidden><span class="when" id="sheet-when-label"></span></div>
       <div class="acts">
-        <button type="button" class="btn btn-copy" id="copy"><span id="copy-label">Забрать читкод</span><svg class="copy-mark" id="copy-mark" viewBox="0 0 23 17" width="23" height="17" hidden aria-hidden="true"></svg></button>
+        <button type="button" class="btn btn-copy" id="copy"><span id="copy-label">Забрать багфикс</span><svg class="copy-mark" id="copy-mark" viewBox="0 0 23 17" width="23" height="17" hidden aria-hidden="true"></svg></button>
         <button type="button" class="btn btn-dl" id="download"><span class="lbl">Скачать</span><span class="md">MD</span></button>
       </div>
       <p class="note" id="note"></p>
@@ -388,6 +388,7 @@
       'Б': ['1111', '1000', '1111', '1001', '1111'],
       'В': ['110', '101', '110', '101', '110'],
       'Д': ['0111', '0101', '0101', '0101', '1111'],
+      'Г': ['111', '100', '100', '100', '100'],
       'Е': ['111', '100', '110', '100', '111'],
       'И': ['1001', '1001', '1011', '1101', '1001'],
       'К': ['1001', '1010', '1100', '1010', '1001'],
@@ -439,8 +440,8 @@
       },
       {
         id: 'kassa',
-        name: 'Новый чит-код',
-        word: 'НОВЫЙ ЧИТ-КОД',
+        name: 'Новый багфикс',
+        word: 'НОВЫЙ БАГФИКС',
         hue: '#FF0080',
         ink: '#ffffff',
         until: '2026-11-26T00:00:00+04:00',
@@ -448,8 +449,8 @@
       },
       {
         id: 'sklad',
-        name: 'Новый чит-код',
-        word: 'НОВЫЙ ЧИТ-КОД',
+        name: 'Новый багфикс',
+        word: 'НОВЫЙ БАГФИКС',
         hue: '#C5F946',
         ink: '#1a1a1a',
         until: '2026-12-01T00:00:00+04:00',
@@ -801,7 +802,7 @@
 
     function resetCopy() {
       checkFrame++
-      document.getElementById('copy-label').textContent = 'Забрать читкод'
+      document.getElementById('copy-label').textContent = 'Забрать багфикс'
       const mark = document.getElementById('copy-mark')
       mark.hidden = true
       ;[...mark.querySelectorAll('circle')].forEach(function (c) { c.setAttribute('fill', 'transparent') })
