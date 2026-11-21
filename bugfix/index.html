@@ -22,6 +22,7 @@
       --action-ink: #FFFFFF;
       --action-text: #6AA5FF;
       --negative: #FF5C4D;
+      --mark: #FF5722;
       --rim-glow: rgba(255, 255, 255, 0.22);
       --rim-shade: rgba(28, 27, 24, 0.10);
       --card-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.9);
@@ -52,19 +53,20 @@
       display: block;
       width: min(100%, 340px);
       aspect-ratio: 1368 / 440;
-      background: #FF8000;
+      background: var(--mark);
       -webkit-mask: url("znak.svg") center / contain no-repeat;
       mask: url("znak.svg") center / contain no-repeat;
     }
-    .forbiz { display: block; width: min(100%, 340px); }
+    .forbiz { display: block; width: min(80%, 272px); }
     .forbiz svg { display: block; width: 100%; height: auto; }
     .lead {
       margin: 16px 0 28px;
       text-align: center;
-      color: var(--text-muted);
-      font-size: 17px;
+      color: var(--mark);
+      font-size: 20px;
       font-weight: 600;
-      line-height: 1.3;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
     }
     .stack { display: flex; flex-direction: column; gap: 10px; }
     .plaque {
@@ -403,7 +405,7 @@
       'Ы': ['10001', '10001', '11101', '10101', '11101'],
       'Й': ['0110', '1001', '1011', '1101', '1001'],
       'Ч': ['1001', '1001', '1111', '0001', '0001'],
-      'Я': ['1111', '1001', '1111', '0010', '0110'],
+      'Я': ['01111', '10001', '10001', '01111', '00101', '01001', '10001'],
       'З': ['111', '001', '111', '001', '111'],
       'Т': ['111', '010', '010', '010', '010'],
       '-': ['000', '000', '111', '000', '000'],
@@ -651,19 +653,26 @@
     setInterval(paintClocks, 30000)
 
     function wordCells(text) {
-      const cells = []
+      const glyphs = []
       let x = 0
+      let height = 5
       for (const ch of text) {
         if (ch === ' ') { x += 4; continue }
         const rows = LETTERS[ch]
         if (!rows) continue
         const width = Math.max.apply(null, rows.map(function (row) { return row.length }))
-        rows.forEach(function (row, y) {
-          for (let c = 0; c < row.length; c++) if (row[c] === '1') cells.push([x + c, y])
-        })
+        glyphs.push({ rows: rows, x: x })
+        height = Math.max(height, rows.length)
         x += width + 1
       }
-      return { cells: cells, cols: Math.max(1, x - 1), rows: 5 }
+      const cells = []
+      glyphs.forEach(function (glyph) {
+        const y0 = Math.floor((height - glyph.rows.length) / 2)
+        glyph.rows.forEach(function (row, y) {
+          for (let c = 0; c < row.length; c++) if (row[c] === '1') cells.push([glyph.x + c, y0 + y])
+        })
+      })
+      return { cells: cells, cols: Math.max(1, x - 1), rows: height }
     }
 
     function mountCutout(host, text) {
@@ -702,7 +711,7 @@
       rect.setAttribute('width', String(w))
       rect.setAttribute('height', String(h))
       rect.setAttribute('rx', '8')
-      rect.setAttribute('fill', '#FF8000')
+      rect.setAttribute('fill', '#FF5722')
       rect.setAttribute('mask', 'url(#forbiz-cut)')
       svg.appendChild(rect)
       host.replaceChildren(svg)
