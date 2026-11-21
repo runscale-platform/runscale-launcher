@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Баг Фикс для Бизнеса</title>
+  <title>Багфикс для бизнеса</title>
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#0A0A0A">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -43,15 +43,23 @@
     }
     h1 {
       margin: 8px 0 0;
-      text-align: center;
-      font-size: clamp(32px, 8.4vw, 40px);
-      font-weight: 800;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
     }
+    .mark {
+      display: block;
+      width: min(100%, 340px);
+      aspect-ratio: 1368 / 440;
+      background: #FF8000;
+      -webkit-mask: url("znak.svg") center / contain no-repeat;
+      mask: url("znak.svg") center / contain no-repeat;
+    }
+    .forbiz { display: block; width: min(100%, 340px); }
+    .forbiz svg { display: block; width: 100%; height: auto; }
     .lead {
-      margin: 10px 0 28px;
+      margin: 16px 0 28px;
       text-align: center;
       color: var(--text-muted);
       font-size: 17px;
@@ -307,8 +315,11 @@
 </head>
 <body>
   <main class="page">
-    <h1>Баг Фикс<br>для Бизнеса</h1>
-    <p class="lead">забрать чит-код</p>
+    <h1>
+      <span class="mark" role="img" aria-label="Багфикс"></span>
+      <span class="forbiz" id="forbiz"></span>
+    </h1>
+    <p class="lead">Выбрать проблему.<br>Забрать решение.</p>
     <div class="stack" id="stack"></div>
     <div class="brand" role="img" aria-label="Ранскеил"><i></i>РАНСКЕИЛ</div>
     <nav class="doors" aria-label="Как начать">
@@ -391,6 +402,8 @@
       'Ы': ['10001', '10001', '11101', '10101', '11101'],
       'Й': ['0110', '1001', '1011', '1101', '1001'],
       'Ч': ['1001', '1001', '1111', '0001', '0001'],
+      'Я': ['1111', '1001', '1111', '0010', '0110'],
+      'З': ['111', '001', '111', '001', '111'],
       'Т': ['111', '010', '010', '010', '010'],
       '-': ['000', '000', '111', '000', '000'],
     }
@@ -652,6 +665,48 @@
       return { cells: cells, cols: Math.max(1, x - 1), rows: 5 }
     }
 
+    function mountCutout(host, text) {
+      const step = 6
+      const r = 2
+      const padX = 3
+      const padY = 2
+      const word = wordCells(text)
+      const cols = word.cols + padX * 2
+      const rows = word.rows + padY * 2
+      const w = (cols - 1) * step + 2 * r
+      const h = (rows - 1) * step + 2 * r
+      const svg = document.createElementNS(NS, 'svg')
+      svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h)
+      svg.setAttribute('role', 'img')
+      svg.setAttribute('aria-label', 'для бизнеса')
+      const mask = document.createElementNS(NS, 'mask')
+      mask.setAttribute('id', 'forbiz-cut')
+      const plate = document.createElementNS(NS, 'rect')
+      plate.setAttribute('width', String(w))
+      plate.setAttribute('height', String(h))
+      plate.setAttribute('fill', '#fff')
+      mask.appendChild(plate)
+      word.cells.forEach(function (p) {
+        const c = document.createElementNS(NS, 'circle')
+        c.setAttribute('cx', (padX + p[0]) * step + r)
+        c.setAttribute('cy', (padY + p[1]) * step + r)
+        c.setAttribute('r', String(r))
+        c.setAttribute('fill', '#000')
+        mask.appendChild(c)
+      })
+      const defs = document.createElementNS(NS, 'defs')
+      defs.appendChild(mask)
+      svg.appendChild(defs)
+      const rect = document.createElementNS(NS, 'rect')
+      rect.setAttribute('width', String(w))
+      rect.setAttribute('height', String(h))
+      rect.setAttribute('rx', '8')
+      rect.setAttribute('fill', '#FF8000')
+      rect.setAttribute('mask', 'url(#forbiz-cut)')
+      svg.appendChild(rect)
+      host.replaceChildren(svg)
+    }
+
     function mountStage(host, item) {
       host.replaceChildren()
       const gap = GAP
@@ -847,6 +902,7 @@
       if (!window.ym || location.hostname !== METRIKA_HOST) return
       window.ym(METRIKA_ID, 'reachGoal', name, { from: mark, door: name.replace('launch_', '') })
     }
+    mountCutout(document.getElementById('forbiz'), 'ДЛЯ БИЗНЕСА')
     arm()
     document.querySelectorAll('[data-door]').forEach(function (a) {
       a.href = doorHref[a.dataset.door]
