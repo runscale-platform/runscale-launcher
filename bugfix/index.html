@@ -113,8 +113,10 @@
       background: color-mix(in srgb, var(--ink) 16%, transparent);
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.04em;
       line-height: 1;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
     }
     @font-face {
       font-family: 'Ranscale Display';
@@ -386,6 +388,10 @@
       'Ш': ['10101', '10101', '10101', '10101', '11111'],
       'Э': ['111', '001', '011', '001', '111'],
       'Ы': ['10001', '10001', '11101', '10101', '11101'],
+      'Й': ['0110', '1001', '1011', '1101', '1001'],
+      'Ч': ['1111', '1001', '1001', '0001', '0001'],
+      'Т': ['111', '010', '010', '010', '010'],
+      '-': ['000', '000', '111', '000', '000'],
     }
 
     const ICONS = {
@@ -419,20 +425,20 @@
       },
       {
         id: 'kassa',
-        name: 'Касса',
-        word: 'КАССА',
+        name: 'Новый чит-код',
+        word: 'НОВЫЙ ЧИТ-КОД',
         hue: '#FF0080',
         ink: '#ffffff',
-        when: 'НОЯ 26',
+        until: '2026-11-26T00:00:00+04:00',
         icons: ['x', 'x', 'x'],
       },
       {
         id: 'sklad',
-        name: 'Склад',
-        word: 'СКЛАД',
+        name: 'Новый чит-код',
+        word: 'НОВЫЙ ЧИТ-КОД',
         hue: '#C5F946',
         ink: '#1a1a1a',
-        when: 'НОЯ 26',
+        until: '2026-12-01T00:00:00+04:00',
         icons: ['x', 'x', 'x'],
       },
     ]
@@ -576,6 +582,24 @@
     const downloadLabel = downloadBtn.querySelector('.lbl')
     let current = null
     let modalPlay = null
+    const clocks = []
+
+    function remain(until) {
+      let ms = new Date(until).getTime() - Date.now()
+      if (ms < 0) ms = 0
+      const min = Math.floor(ms / 60000)
+      const d = Math.floor(min / 1440)
+      const h = Math.floor((min % 1440) / 60)
+      const m = min % 60
+      return d + 'д ' + h + 'ч ' + m + ' мин'
+    }
+
+    function paintClocks() {
+      clocks.forEach(function (c) { c.el.textContent = remain(c.until) })
+      if (current && current.until && !document.getElementById('sheet-when').hidden) {
+        document.getElementById('sheet-when-label').textContent = remain(current.until)
+      }
+    }
     let copyTimer = 0
     let downloadTimer = 0
 
@@ -593,10 +617,11 @@
       const name = document.createElement('b')
       name.textContent = item.name
       line.appendChild(name)
-      if (item.when) {
+      if (item.until) {
         const badge = document.createElement('span')
         badge.className = 'when'
-        badge.textContent = item.when
+        badge.textContent = remain(item.until)
+        clocks.push({ el: badge, until: item.until })
         line.appendChild(badge)
       }
       copy.appendChild(line)
@@ -607,11 +632,14 @@
       button.addEventListener('click', function () { open(item) })
       stack.appendChild(button)
     })
+    paintClocks()
+    setInterval(paintClocks, 30000)
 
     function wordCells(text) {
       const cells = []
       let x = 0
       for (const ch of text) {
+        if (ch === ' ') { x += 4; continue }
         const rows = LETTERS[ch]
         if (!rows) continue
         const width = Math.max.apply(null, rows.map(function (row) { return row.length }))
@@ -672,8 +700,8 @@
       panel.style.setProperty('--ink', item.ink)
       acts.hidden = !item.md
       const sheetWhen = document.getElementById('sheet-when')
-      sheetWhen.hidden = !item.when
-      document.getElementById('sheet-when-label').textContent = item.when || ''
+      sheetWhen.hidden = !item.until
+      document.getElementById('sheet-when-label').textContent = item.until ? remain(item.until) : ''
       note.textContent = ''
       resetCopy()
       downloadLabel.textContent = 'Скачать'
