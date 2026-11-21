@@ -783,17 +783,41 @@
     docs.addEventListener('click', function (event) {
       if (event.target.closest('[data-close], #docs-close')) setDocs(false)
     })
+    const METRIKA_ID = 113084253
+    const METRIKA_HOST = 'x.gderost.ru'
     const markRaw = (new URLSearchParams(location.search).get('from') || '').trim().toLowerCase()
-    const mark = /^[a-z0-9][a-z0-9-]{0,63}$/.test(markRaw) ? markRaw : 'instagram-runscale'
+    const mark = /^[a-z0-9][a-z0-9-]{0,63}$/.test(markRaw) ? markRaw : 'instagram-bugfix'
     const doorHref = {
       focus: 'https://ultra.runscale.ru/?from=' + mark + '&product=focus',
       ultra: 'https://ultra.runscale.ru/?from=' + mark + '&product=ultra',
-      track: 'https://gderost.ru/?from=launch',
+      track: 'https://gderost.ru/?from=' + mark,
     }
+    function consentAll() {
+      try { return JSON.parse(localStorage.getItem('runscale.ultra.consent.v1') || 'null')?.decision === 'all' } catch { return false }
+    }
+    function arm() {
+      if (location.hostname !== METRIKA_HOST || !consentAll()) return
+      if (!window.ym) {
+        window.ym = function () { (window.ym.a = window.ym.a || []).push(arguments) }
+        const s = document.createElement('script')
+        s.async = true
+        s.src = 'https://mc.yandex.ru/metrika/tag.js?id=' + METRIKA_ID
+        document.head.appendChild(s)
+        window.ym(METRIKA_ID, 'init', { clickmap: true, trackLinks: true, accurateTrackBounce: true, defer: true })
+        window.ym(METRIKA_ID, 'hit', 'https://ultra.runscale.ru/launch/?from=' + encodeURIComponent(mark), { title: document.title, referer: document.referrer })
+      }
+      window.ym(METRIKA_ID, 'reachGoal', 'launch_open', { from: mark })
+    }
+    function goal(name) {
+      if (!window.ym || location.hostname !== METRIKA_HOST) return
+      window.ym(METRIKA_ID, 'reachGoal', name, { from: mark, door: name.replace('launch_', '') })
+    }
+    arm()
     document.querySelectorAll('[data-door]').forEach(function (a) {
       a.href = doorHref[a.dataset.door]
       a.target = '_blank'
       a.rel = 'noopener noreferrer'
+      a.addEventListener('click', function () { goal('launch_' + a.dataset.door) })
     })
     document.addEventListener('keydown', function (event) {
       if (event.key !== 'Escape') return
