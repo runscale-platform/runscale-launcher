@@ -26,8 +26,6 @@
       --rim-shade: rgba(28, 27, 24, 0.10);
       --card-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.9);
       --scrim: rgba(0, 0, 0, 0.6);
-      --ink: #F2F2F2;
-      --dim: #96B2EF;
       color-scheme: dark;
     }
     * { box-sizing: border-box; }
@@ -72,8 +70,8 @@
       padding: 14px 14px 14px 18px;
       border: 0;
       border-radius: 16px;
-      background: var(--surface);
-      color: var(--text);
+      background: var(--hue);
+      color: var(--ink);
       font: inherit;
       text-align: left;
       cursor: pointer;
@@ -96,15 +94,16 @@
       mask-composite: exclude;
       pointer-events: none;
     }
-    .plaque:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+    .plaque:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
     .plaque b {
       font-size: 22px;
       font-weight: 800;
       letter-spacing: -0.02em;
       line-height: 1.15;
     }
-    .glyphs { display: flex; align-items: center; gap: 8px; flex: none; }
-    .glyphs svg, .modal-glyphs svg { display: block; overflow: visible; }
+    .glyphs { display: flex; align-items: center; gap: 6px; flex: none; color: var(--ink); }
+    .glyphs svg { width: 32px; height: 32px; display: block; overflow: visible; }
+    .modal-glyphs svg { display: block; overflow: visible; }
     .modal {
       position: fixed;
       inset: 0;
@@ -120,8 +119,8 @@
       width: 100%;
       max-height: 92dvh;
       overflow: auto;
-      background: var(--sheet);
-      color: var(--text);
+      background: var(--hue, var(--sheet));
+      color: var(--ink, var(--text));
       border-radius: 20px 20px 0 0;
       padding: 22px 20px max(20px, env(safe-area-inset-bottom));
     }
@@ -133,30 +132,40 @@
       height: 44px;
       border: 0;
       border-radius: 12px;
-      background: var(--surface-2);
-      color: var(--text);
+      background: color-mix(in srgb, var(--ink, var(--text)) 14%, transparent);
+      color: var(--ink, var(--text));
       display: grid;
       place-items: center;
       cursor: pointer;
     }
     .x svg { width: 22px; height: 22px; }
-    .x:focus-visible, .btn:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+    .x:focus-visible, .btn:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
     .modal-glyphs {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 16px;
-      margin: 52px 8px 22px;
+      gap: 14px;
+      margin: 48px 8px 18px;
+      color: var(--ink, var(--text));
     }
-    .modal-glyphs svg { width: 76px; height: 76px; }
+    .modal-glyphs svg { width: 52px; height: 52px; }
     .panel h2 {
-      margin: 0 8px 22px;
-      text-align: center;
-      font-size: clamp(26px, 7vw, 32px);
-      font-weight: 800;
-      line-height: 1.12;
-      letter-spacing: -0.03em;
-      color: var(--text);
+      margin: 0 0 22px;
+      display: flex;
+      justify-content: center;
+      color: var(--ink, var(--text));
+    }
+    .panel h2 svg { display: block; overflow: visible; max-width: 100%; height: auto; }
+    .sr {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
     .acts { display: flex; flex-direction: column; gap: 8px; }
     .btn {
@@ -175,25 +184,26 @@
       -webkit-tap-highlight-color: transparent;
     }
     .btn-copy {
-      background: var(--action);
-      color: var(--action-ink);
+      background: var(--ink);
+      color: var(--hue);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -1px 0 rgba(0, 0, 0, 0.28);
     }
     .btn-dl {
-      background: var(--surface-2);
-      color: var(--text);
-      box-shadow: inset 0 1px 0 var(--rim-glow), inset 0 -1px 0 var(--rim-shade);
+      background: color-mix(in srgb, var(--ink) 14%, transparent);
+      color: var(--ink);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -1px 0 rgba(0, 0, 0, 0.12);
     }
     .md {
       border-radius: 4px;
       padding: 2px 6px;
-      background: var(--text);
-      color: var(--surface-2);
+      background: var(--ink);
+      color: var(--hue);
       font-size: 11px;
       font-weight: 650;
       letter-spacing: 0.04em;
       line-height: 1.3;
     }
+    .acts[hidden] { display: none; }
     .note {
       min-height: 0;
       margin: 8px 0 0;
@@ -222,7 +232,7 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
       <div class="modal-glyphs" id="modal-glyphs"></div>
-      <h2 id="reel-title"></h2>
+      <h2 id="reel-title"><span class="sr" id="reel-name"></span><span id="reel-word"></span></h2>
       <div class="acts">
         <button type="button" class="btn btn-copy" id="copy">Скопировать</button>
         <button type="button" class="btn btn-dl" id="download"><span class="lbl">Скачать</span><span class="md">MD</span></button>
@@ -235,10 +245,26 @@
     const N = 17
     const STEP = 3
     const R = 1
-    const AP = 533
-    const INK = '#F2F2F2'
-    const DIM = '#96B2EF'
+    const CYCLE = 2000
     const STILL = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const LETTERS = {
+      'А': ['111', '101', '111', '101', '101'],
+      'Б': ['1111', '1000', '1111', '1001', '1111'],
+      'В': ['110', '101', '110', '101', '110'],
+      'Д': ['0111', '0101', '0101', '0101', '1111'],
+      'Е': ['111', '100', '110', '100', '111'],
+      'И': ['1001', '1001', '1011', '1101', '1001'],
+      'К': ['1001', '1010', '1100', '1010', '1001'],
+      'Л': ['0111', '0101', '0101', '0101', '1101'],
+      'Н': ['1001', '1001', '1111', '1001', '1001'],
+      'О': ['111', '101', '101', '101', '111'],
+      'Р': ['111', '101', '111', '100', '100'],
+      'С': ['111', '100', '100', '100', '111'],
+      'Ф': ['00100', '11111', '10101', '11111', '00100'],
+      'Ш': ['10101', '10101', '10101', '10101', '11111'],
+      'Э': ['111', '001', '011', '001', '111'],
+      'Ы': ['10001', '10001', '11101', '10101', '11101'],
+    }
 
     const ICONS = {
       chart: [[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],[1,8],[1,9],[1,10],[1,11],[1,12],[1,13],[1,14],[2,14],[3,11],[3,12],[3,13],[3,14],[4,11],[4,12],[4,13],[4,14],[5,14],[6,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,8],[7,9],[7,10],[7,11],[7,12],[7,13],[7,14],[8,14],[9,5],[9,6],[9,7],[9,8],[9,9],[9,10],[9,11],[9,12],[9,13],[9,14],[10,5],[10,6],[10,7],[10,8],[10,9],[10,10],[10,11],[10,12],[10,13],[10,14],[11,14],[12,2],[12,3],[12,4],[12,5],[12,6],[12,7],[12,8],[12,9],[12,10],[12,11],[12,12],[12,13],[12,14],[13,2],[13,3],[13,4],[13,5],[13,6],[13,7],[13,8],[13,9],[13,10],[13,11],[13,12],[13,13],[13,14],[14,14],[15,14]],
@@ -250,7 +276,9 @@
       {
         id: 'dashboards',
         name: 'Дашборды',
-        reel: 'Дашборды не стратегия',
+        word: 'ДАШБОРДЫ',
+        hue: '#FFD60A',
+        ink: '#1a1a1a',
         file: 'дашборды.md',
         icons: ['chart', 'person', 'answers'],
         md: [
@@ -265,6 +293,22 @@
           'Сначала решение, потом данные, потом технология.',
           '',
         ].join('\n'),
+      },
+      {
+        id: 'kassa',
+        name: 'Касса',
+        word: 'КАССА',
+        hue: '#FF0080',
+        ink: '#ffffff',
+        icons: ['chart', 'person', 'answers'],
+      },
+      {
+        id: 'sklad',
+        name: 'Склад',
+        word: 'СКЛАД',
+        hue: '#C5F946',
+        ink: '#1a1a1a',
+        icons: ['chart', 'person', 'answers'],
       },
     ]
 
@@ -290,7 +334,8 @@
     const NS = 'http://www.w3.org/2000/svg'
     const SIZE = (N - 1) * STEP + 2 * R
     const plays = []
-    let looping = false
+    const WORD_STEP = 7
+    const WORD_R = 2
 
     function circle(x, y) {
       const c = document.createElementNS(NS, 'circle')
@@ -310,77 +355,53 @@
         svg.setAttribute('width', SIZE)
         svg.setAttribute('height', SIZE)
         svg.setAttribute('aria-hidden', 'true')
-        const ink = order.map(function (p) {
+        const dots = order.map(function (p) {
           const c = circle(p[0], p[1])
           svg.appendChild(c)
           return c
         })
-        const spark = []
-        for (let k = 0; k < 5; k++) {
-          const c = circle(0, 0)
-          svg.appendChild(c)
-          spark.push(c)
-        }
         host.appendChild(svg)
-        const have = {}
-        order.forEach(function (p) { have[p[0] + ',' + p[1]] = true })
-        const rest = []
-        for (let y = 0; y < N; y++) {
-          for (let x = 0; x < N; x++) {
-            if (!have[x + ',' + y]) rest.push([x, y])
-          }
-        }
-        return { order: order, ink: ink, spark: spark, rest: rest }
+        return { order: order, dots: dots }
       })
-      const play = { icons: icons, t0: performance.now() }
+      const play = { icons: icons }
       plays.push(play)
-      paint(play, STILL ? AP * 4 : 0)
+      paint(play, 0)
       return play
+    }
+
+    function countAt(elapsed, i, total) {
+      if (STILL) return total
+      const t = elapsed % CYCLE
+      const start = i * 200
+      const build = 360
+      if (t < start) return 0
+      if (t < start + build) return Math.max(1, Math.round(total * (t - start) / build))
+      if (t < 1500) return total
+      return Math.max(0, Math.round(total * (1 - (t - 1500) / 500)))
     }
 
     function paint(play, elapsed) {
       play.icons.forEach(function (icon, i) {
-        const local = elapsed - i * AP
-        const n = STILL ? icon.order.length : Math.max(0, Math.min(icon.order.length, Math.round(icon.order.length * local / AP)))
-        icon.ink.forEach(function (el, k) {
-          el.setAttribute('fill', k < n ? INK : 'transparent')
-        })
-        const live = !STILL && n > 0 && n < icon.order.length
-        icon.spark.forEach(function (el, k) {
-          if (!live) {
-            el.setAttribute('fill', 'transparent')
-            return
-          }
-          const bag = shuffle(icon.rest.concat(icon.order.slice(n)), (Math.floor(elapsed / 66) + i * 19 + k) >>> 0)
-          const p = bag[k]
-          el.setAttribute('cx', p[0] * STEP + R)
-          el.setAttribute('cy', p[1] * STEP + R)
-          el.setAttribute('fill', DIM)
+        const n = countAt(elapsed, i, icon.order.length)
+        icon.dots.forEach(function (el, k) {
+          el.setAttribute('fill', k < n ? 'currentColor' : 'transparent')
         })
       })
     }
 
+    const T0 = performance.now()
     function tick(now) {
-      let run = false
-      plays.forEach(function (play) {
-        const elapsed = now - play.t0
-        paint(play, elapsed)
-        if (elapsed < AP * 3 + 40) run = true
-      })
-      if (run) requestAnimationFrame(tick)
-      else looping = false
+      const elapsed = now - T0
+      plays.forEach(function (play) { paint(play, elapsed) })
+      if (!STILL) requestAnimationFrame(tick)
     }
-    function ensure() {
-      if (STILL || looping) return
-      looping = true
-      requestAnimationFrame(tick)
-    }
-    ensure()
+    requestAnimationFrame(tick)
 
     const stack = document.getElementById('stack')
     const modal = document.getElementById('modal')
     const modalGlyphs = document.getElementById('modal-glyphs')
-    const title = document.getElementById('reel-title')
+    const panel = document.querySelector('.panel')
+    const acts = document.querySelector('.acts')
     const note = document.getElementById('note')
     const copyBtn = document.getElementById('copy')
     const downloadBtn = document.getElementById('download')
@@ -395,6 +416,8 @@
       button.type = 'button'
       button.className = 'plaque'
       button.dataset.id = item.id
+      button.style.setProperty('--hue', item.hue)
+      button.style.setProperty('--ink', item.ink)
       const name = document.createElement('b')
       name.textContent = item.name
       const icons = document.createElement('span')
@@ -405,6 +428,43 @@
       stack.appendChild(button)
     })
 
+    function wordCells(text) {
+      const cells = []
+      let x = 0
+      for (const ch of text) {
+        const rows = LETTERS[ch]
+        if (!rows) continue
+        const width = Math.max.apply(null, rows.map(function (row) { return row.length }))
+        rows.forEach(function (row, y) {
+          for (let c = 0; c < row.length; c++) if (row[c] === '1') cells.push([x + c, y])
+        })
+        x += width + 1
+      }
+      return { cells: cells, cols: Math.max(1, x - 1), rows: 5 }
+    }
+
+    function paintWord(text) {
+      const host = document.getElementById('reel-word')
+      host.replaceChildren()
+      const fig = wordCells(text)
+      const w = (fig.cols - 1) * WORD_STEP + 2 * WORD_R
+      const h = (fig.rows - 1) * WORD_STEP + 2 * WORD_R
+      const svg = document.createElementNS(NS, 'svg')
+      svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h)
+      svg.setAttribute('width', w)
+      svg.setAttribute('height', h)
+      svg.setAttribute('aria-hidden', 'true')
+      fig.cells.forEach(function (p) {
+        const c = document.createElementNS(NS, 'circle')
+        c.setAttribute('cx', p[0] * WORD_STEP + WORD_R)
+        c.setAttribute('cy', p[1] * WORD_STEP + WORD_R)
+        c.setAttribute('r', WORD_R)
+        c.setAttribute('fill', 'currentColor')
+        svg.appendChild(c)
+      })
+      host.appendChild(svg)
+    }
+
     function open(item) {
       current = item
       if (modalPlay) {
@@ -412,9 +472,11 @@
         if (at >= 0) plays.splice(at, 1)
       }
       modalPlay = mountIcons(modalGlyphs, item.icons, 20261120)
-      modalPlay.t0 = performance.now()
-      ensure()
-      title.textContent = item.reel
+      paintWord(item.word)
+      document.getElementById('reel-name').textContent = item.name
+      panel.style.setProperty('--hue', item.hue)
+      panel.style.setProperty('--ink', item.ink)
+      acts.hidden = !item.md
       note.textContent = ''
       copyBtn.textContent = 'Скопировать'
       downloadLabel.textContent = 'Скачать'
@@ -448,7 +510,7 @@
     }
 
     async function copyText() {
-      if (!current) return
+      if (!current || !current.md) return
       note.textContent = ''
       let ok = false
       try {
@@ -466,7 +528,7 @@
     }
 
     function downloadFile() {
-      if (!current) return
+      if (!current || !current.md) return
       const blob = new Blob([current.md], { type: 'text/markdown;charset=utf-8' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
