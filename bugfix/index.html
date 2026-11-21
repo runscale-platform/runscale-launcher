@@ -227,8 +227,9 @@
     .scrim { position: absolute; inset: 0; background: var(--scrim); }
     .panel {
       position: relative;
-      width: min(100%, 430px);
+      width: 100%;
       max-height: 92dvh;
+      margin-top: auto;
       overflow: auto;
       overscroll-behavior: contain;
       background: var(--hue, var(--sheet));
@@ -413,7 +414,7 @@
       'Ы': ['10001', '10001', '11101', '10101', '11101'],
       'Й': ['0110', '1001', '1011', '1101', '1001'],
       'Ч': ['1001', '1001', '1111', '0001', '0001'],
-      'Я': ['01111', '10001', '10001', '01111', '00101', '01001', '10001'],
+      'Я': ['01111', '10001', '01111', '00101', '10001'],
       'З': ['111', '001', '111', '001', '111'],
       'Т': ['111', '010', '010', '010', '010'],
       '-': ['000', '000', '111', '000', '000'],
@@ -661,26 +662,19 @@
     setInterval(paintClocks, 30000)
 
     function wordCells(text) {
-      const glyphs = []
+      const cells = []
       let x = 0
-      let height = 5
       for (const ch of text) {
         if (ch === ' ') { x += 4; continue }
         const rows = LETTERS[ch]
         if (!rows) continue
         const width = Math.max.apply(null, rows.map(function (row) { return row.length }))
-        glyphs.push({ rows: rows, x: x })
-        height = Math.max(height, rows.length)
+        rows.forEach(function (row, y) {
+          for (let c = 0; c < row.length; c++) if (row[c] === '1') cells.push([x + c, y])
+        })
         x += width + 1
       }
-      const cells = []
-      glyphs.forEach(function (glyph) {
-        const y0 = Math.floor((height - glyph.rows.length) / 2)
-        glyph.rows.forEach(function (row, y) {
-          for (let c = 0; c < row.length; c++) if (row[c] === '1') cells.push([glyph.x + c, y0 + y])
-        })
-      })
-      return { cells: cells, cols: Math.max(1, x - 1), rows: height }
+      return { cells: cells, cols: Math.max(1, x - 1), rows: 5 }
     }
 
     function mountCutout(host, text) {
