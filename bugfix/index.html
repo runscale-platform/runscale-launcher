@@ -5,79 +5,106 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Баг Фикс для Бизнеса</title>
   <meta name="robots" content="noindex">
-  <meta name="theme-color" content="#0B0B0D">
+  <meta name="theme-color" content="#0A0A0A">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <style>
     :root {
-      --bg: #0b0b0d;
-      --text: #f2f2f4;
-      --text-sec: #b8b9c0;
-      --blue: #2563eb;
-      --blue-text: #6aa5ff;
-      --glass: rgba(20, 20, 24, 0.72);
-      --edge: color-mix(in srgb, var(--blue-text) 45%, transparent);
-      --ink: #1c1b18;
-      --sheet: #fff;
-      --soft: #eff1f6;
+      --bg: #0A0A0A;
+      --surface: #2E2E2E;
+      --surface-2: #383838;
+      --sheet: #242424;
+      --text: #F2F2F2;
+      --text-secondary: #C4C4C4;
+      --text-muted: #A8A8A8;
+      --action: #2563EB;
+      --action-ink: #FFFFFF;
+      --action-text: #6AA5FF;
+      --negative: #FF5C4D;
+      --rim-glow: rgba(255, 255, 255, 0.22);
+      --rim-shade: rgba(28, 27, 24, 0.10);
+      --card-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.9);
+      --scrim: rgba(0, 0, 0, 0.6);
+      --ink: #F2F2F2;
+      --dim: #96B2EF;
       color-scheme: dark;
     }
     * { box-sizing: border-box; }
     html, body { margin: 0; background: var(--bg); color: var(--text); }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
       min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
     }
     .page {
-      width: min(460px, 100%);
+      width: min(430px, 100%);
       margin: 0 auto;
-      padding: max(36px, env(safe-area-inset-top)) 18px max(28px, env(safe-area-inset-bottom));
+      padding: max(28px, env(safe-area-inset-top)) 18px max(28px, env(safe-area-inset-bottom));
     }
     h1 {
-      margin: 0;
+      margin: 8px 0 0;
       text-align: center;
-      font-size: clamp(34px, 9vw, 44px);
+      font-size: clamp(32px, 8.4vw, 40px);
       font-weight: 800;
       line-height: 1.05;
       letter-spacing: -0.03em;
+      color: var(--text);
     }
     .lead {
-      margin: 12px 0 28px;
+      margin: 10px 0 28px;
       text-align: center;
-      color: var(--text-sec);
-      font-size: clamp(18px, 5vw, 22px);
+      color: var(--text-muted);
+      font-size: 17px;
       font-weight: 600;
       line-height: 1.3;
     }
     .stack { display: flex; flex-direction: column; gap: 10px; }
     .plaque {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       width: 100%;
-      min-height: 84px;
-      padding: 16px 16px 16px 20px;
-      border: 2px solid var(--edge);
+      min-height: 76px;
+      padding: 14px 14px 14px 18px;
+      border: 0;
       border-radius: 16px;
-      background: var(--glass);
-      color: inherit;
+      background: var(--surface);
+      color: var(--text);
       font: inherit;
       text-align: left;
       cursor: pointer;
+      box-shadow:
+        inset 0 1px 0 var(--rim-glow),
+        inset 0 -1px 0 var(--rim-shade),
+        var(--card-shadow);
       -webkit-tap-highlight-color: transparent;
     }
-    .plaque:active { transform: scale(0.985); }
-    .plaque:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .plaque::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(150deg, var(--rim-glow) 0%, rgba(255, 255, 255, 0) 45%, var(--rim-shade) 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    .plaque:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
     .plaque b {
       font-size: 22px;
       font-weight: 800;
       letter-spacing: -0.02em;
       line-height: 1.15;
     }
-    .glyphs { display: flex; align-items: center; gap: 14px; flex: none; }
-    .glyphs svg { width: 36px; height: 36px; display: block; }
+    .glyphs { display: flex; align-items: center; gap: 8px; flex: none; }
+    .glyphs svg, .modal-glyphs svg { display: block; overflow: visible; }
     .modal {
       position: fixed;
       inset: 0;
@@ -87,17 +114,16 @@
       justify-content: center;
     }
     .modal[hidden] { display: none; }
-    .scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); }
+    .scrim { position: absolute; inset: 0; background: var(--scrim); }
     .panel {
       position: relative;
       width: 100%;
       max-height: 92dvh;
       overflow: auto;
       background: var(--sheet);
-      color: var(--ink);
-      border-radius: 18px 18px 0 0;
+      color: var(--text);
+      border-radius: 20px 20px 0 0;
       padding: 22px 20px max(20px, env(safe-area-inset-bottom));
-      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
     }
     .x {
       position: absolute;
@@ -107,29 +133,30 @@
       height: 44px;
       border: 0;
       border-radius: 12px;
-      background: var(--soft);
-      color: var(--ink);
+      background: var(--surface-2);
+      color: var(--text);
       display: grid;
       place-items: center;
       cursor: pointer;
     }
     .x svg { width: 22px; height: 22px; }
-    .x:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .x:focus-visible, .btn:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
     .modal-glyphs {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 22px;
-      margin: 28px 48px 18px;
+      gap: 16px;
+      margin: 52px 8px 22px;
     }
-    .modal-glyphs svg { width: 48px; height: 48px; display: block; }
+    .modal-glyphs svg { width: 76px; height: 76px; }
     .panel h2 {
       margin: 0 8px 22px;
       text-align: center;
-      font-size: clamp(26px, 7vw, 34px);
+      font-size: clamp(26px, 7vw, 32px);
       font-weight: 800;
       line-height: 1.12;
       letter-spacing: -0.03em;
+      color: var(--text);
     }
     .acts { display: flex; flex-direction: column; gap: 8px; }
     .btn {
@@ -147,34 +174,37 @@
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
     }
-    .btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
-    .btn-copy { background: var(--blue); color: #fff; }
-    .btn-dl { background: var(--soft); color: var(--ink); }
+    .btn-copy {
+      background: var(--action);
+      color: var(--action-ink);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+    }
+    .btn-dl {
+      background: var(--surface-2);
+      color: var(--text);
+      box-shadow: inset 0 1px 0 var(--rim-glow), inset 0 -1px 0 var(--rim-shade);
+    }
     .md {
       border-radius: 4px;
       padding: 2px 6px;
-      background: var(--ink);
-      color: var(--soft);
+      background: var(--text);
+      color: var(--surface-2);
       font-size: 11px;
       font-weight: 650;
       letter-spacing: 0.04em;
       line-height: 1.3;
     }
     .note {
-      min-height: 1.2em;
+      min-height: 0;
       margin: 8px 0 0;
       text-align: center;
       font-size: 13px;
-      color: #d92d20;
+      color: var(--negative);
     }
     .note:empty { display: none; }
     @media (min-width: 760px) {
       .modal { align-items: center; padding: 24px; }
-      .panel {
-        max-width: 440px;
-        border-radius: 20px;
-        padding: 28px 24px 24px;
-      }
+      .panel { max-width: 430px; border-radius: 20px; padding: 28px 24px 24px; }
     }
   </style>
 </head>
@@ -201,27 +231,28 @@
     </section>
   </div>
 
-  <svg xmlns="http://www.w3.org/2000/svg" hidden aria-hidden="true">
-    <symbol id="i-chart" viewBox="0 0 48 48">
-      <path fill="currentColor" d="M5 42V26h10v16H5zm14 0V12h10v30H19zm14 0V18h10v24H33z"/>
-    </symbol>
-    <symbol id="i-person" viewBox="0 0 48 48">
-      <path fill="currentColor" d="M24 4a9 9 0 1 1 0 18 9 9 0 0 1 0-18zM7 44c1.4-9 7.6-14 17-14s15.6 5 17 14H7z"/>
-    </symbol>
-    <symbol id="i-clock" viewBox="0 0 48 48">
-      <path fill="currentColor" fill-rule="evenodd" d="M24 4a20 20 0 1 0 0 40 20 20 0 0 0 0-40zm0 6a14 14 0 1 1 0 28 14 14 0 0 1 0-28z"/>
-      <path fill="currentColor" d="M22 13h4v13.2l8 4.6-2.1 3.6L22 28.4V13z"/>
-    </symbol>
-  </svg>
-
   <script>
+    const N = 17
+    const STEP = 3
+    const R = 1
+    const AP = 533
+    const INK = '#F2F2F2'
+    const DIM = '#96B2EF'
+    const STILL = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    const ICONS = {
+      chart: [[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],[1,8],[1,9],[1,10],[1,11],[1,12],[1,13],[1,14],[2,14],[3,11],[3,12],[3,13],[3,14],[4,11],[4,12],[4,13],[4,14],[5,14],[6,8],[6,9],[6,10],[6,11],[6,12],[6,13],[6,14],[7,8],[7,9],[7,10],[7,11],[7,12],[7,13],[7,14],[8,14],[9,5],[9,6],[9,7],[9,8],[9,9],[9,10],[9,11],[9,12],[9,13],[9,14],[10,5],[10,6],[10,7],[10,8],[10,9],[10,10],[10,11],[10,12],[10,13],[10,14],[11,14],[12,2],[12,3],[12,4],[12,5],[12,6],[12,7],[12,8],[12,9],[12,10],[12,11],[12,12],[12,13],[12,14],[13,2],[13,3],[13,4],[13,5],[13,6],[13,7],[13,8],[13,9],[13,10],[13,11],[13,12],[13,13],[13,14],[14,14],[15,14]],
+      person: [[4,10],[4,11],[4,12],[4,13],[4,14],[5,9],[5,14],[6,3],[6,4],[6,5],[6,8],[6,9],[6,14],[7,2],[7,6],[7,14],[8,2],[8,6],[8,14],[9,2],[9,6],[9,14],[10,3],[10,4],[10,5],[10,8],[10,9],[10,14],[11,9],[11,14],[12,10],[12,11],[12,12],[12,13],[12,14]],
+      answers: [[3,4],[3,5],[3,8],[3,9],[3,12],[3,13],[4,4],[4,5],[4,8],[4,9],[4,12],[4,13],[7,4],[7,5],[7,8],[7,9],[7,12],[7,13],[8,4],[8,5],[8,8],[8,9],[8,12],[8,13],[9,4],[9,5],[9,8],[9,9],[9,12],[9,13],[10,4],[10,5],[10,8],[10,9],[10,12],[10,13],[11,4],[11,5],[11,8],[11,9],[11,12],[11,13],[12,4],[12,5],[12,8],[12,9],[12,12],[12,13],[13,4],[13,5],[13,8],[13,9],[13,12],[13,13]]
+    }
+
     const SERIES = [
       {
         id: 'dashboards',
         name: 'Дашборды',
         reel: 'Дашборды не стратегия',
         file: 'дашборды.md',
-        icons: ['chart', 'person', 'clock'],
+        icons: ['chart', 'person', 'answers'],
         md: [
           '# Дашборды не стратегия',
           '',
@@ -237,6 +268,115 @@
       },
     ]
 
+    function rng(seed) {
+      let s = seed >>> 0
+      return function () {
+        s = (Math.imul(1664525, s) + 1013904223) >>> 0
+        return s / 4294967296
+      }
+    }
+    function shuffle(list, seed) {
+      const a = list.slice()
+      const rand = rng(seed)
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(rand() * (i + 1))
+        const t = a[i]
+        a[i] = a[j]
+        a[j] = t
+      }
+      return a
+    }
+
+    const NS = 'http://www.w3.org/2000/svg'
+    const SIZE = (N - 1) * STEP + 2 * R
+    const plays = []
+    let looping = false
+
+    function circle(x, y) {
+      const c = document.createElementNS(NS, 'circle')
+      c.setAttribute('cx', x * STEP + R)
+      c.setAttribute('cy', y * STEP + R)
+      c.setAttribute('r', R)
+      c.setAttribute('fill', 'transparent')
+      return c
+    }
+
+    function mountIcons(host, names, seed) {
+      host.replaceChildren()
+      const icons = names.map(function (name, i) {
+        const order = shuffle(ICONS[name], seed + i * 97)
+        const svg = document.createElementNS(NS, 'svg')
+        svg.setAttribute('viewBox', '0 0 ' + SIZE + ' ' + SIZE)
+        svg.setAttribute('width', SIZE)
+        svg.setAttribute('height', SIZE)
+        svg.setAttribute('aria-hidden', 'true')
+        const ink = order.map(function (p) {
+          const c = circle(p[0], p[1])
+          svg.appendChild(c)
+          return c
+        })
+        const spark = []
+        for (let k = 0; k < 5; k++) {
+          const c = circle(0, 0)
+          svg.appendChild(c)
+          spark.push(c)
+        }
+        host.appendChild(svg)
+        const have = {}
+        order.forEach(function (p) { have[p[0] + ',' + p[1]] = true })
+        const rest = []
+        for (let y = 0; y < N; y++) {
+          for (let x = 0; x < N; x++) {
+            if (!have[x + ',' + y]) rest.push([x, y])
+          }
+        }
+        return { order: order, ink: ink, spark: spark, rest: rest }
+      })
+      const play = { icons: icons, t0: performance.now() }
+      plays.push(play)
+      paint(play, STILL ? AP * 4 : 0)
+      return play
+    }
+
+    function paint(play, elapsed) {
+      play.icons.forEach(function (icon, i) {
+        const local = elapsed - i * AP
+        const n = STILL ? icon.order.length : Math.max(0, Math.min(icon.order.length, Math.round(icon.order.length * local / AP)))
+        icon.ink.forEach(function (el, k) {
+          el.setAttribute('fill', k < n ? INK : 'transparent')
+        })
+        const live = !STILL && n > 0 && n < icon.order.length
+        icon.spark.forEach(function (el, k) {
+          if (!live) {
+            el.setAttribute('fill', 'transparent')
+            return
+          }
+          const bag = shuffle(icon.rest.concat(icon.order.slice(n)), (Math.floor(elapsed / 66) + i * 19 + k) >>> 0)
+          const p = bag[k]
+          el.setAttribute('cx', p[0] * STEP + R)
+          el.setAttribute('cy', p[1] * STEP + R)
+          el.setAttribute('fill', DIM)
+        })
+      })
+    }
+
+    function tick(now) {
+      let run = false
+      plays.forEach(function (play) {
+        const elapsed = now - play.t0
+        paint(play, elapsed)
+        if (elapsed < AP * 3 + 40) run = true
+      })
+      if (run) requestAnimationFrame(tick)
+      else looping = false
+    }
+    function ensure() {
+      if (STILL || looping) return
+      looping = true
+      requestAnimationFrame(tick)
+    }
+    ensure()
+
     const stack = document.getElementById('stack')
     const modal = document.getElementById('modal')
     const modalGlyphs = document.getElementById('modal-glyphs')
@@ -246,25 +386,11 @@
     const downloadBtn = document.getElementById('download')
     const downloadLabel = downloadBtn.querySelector('.lbl')
     let current = null
+    let modalPlay = null
     let copyTimer = 0
     let downloadTimer = 0
 
-    function glyph(id) {
-      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-      svg.setAttribute('viewBox', '0 0 48 48')
-      svg.setAttribute('aria-hidden', 'true')
-      const use = document.createElementNS('http://www.w3.org/2000/svg', 'use')
-      use.setAttribute('href', '#i-' + id)
-      svg.appendChild(use)
-      return svg
-    }
-
-    function paintGlyphs(host, icons) {
-      host.replaceChildren()
-      icons.forEach((id) => host.appendChild(glyph(id)))
-    }
-
-    SERIES.forEach((item) => {
+    SERIES.forEach(function (item) {
       const button = document.createElement('button')
       button.type = 'button'
       button.className = 'plaque'
@@ -273,15 +399,21 @@
       name.textContent = item.name
       const icons = document.createElement('span')
       icons.className = 'glyphs'
-      paintGlyphs(icons, item.icons)
+      mountIcons(icons, item.icons, 20261120)
       button.append(name, icons)
-      button.addEventListener('click', () => open(item))
+      button.addEventListener('click', function () { open(item) })
       stack.appendChild(button)
     })
 
     function open(item) {
       current = item
-      paintGlyphs(modalGlyphs, item.icons)
+      if (modalPlay) {
+        const at = plays.indexOf(modalPlay)
+        if (at >= 0) plays.splice(at, 1)
+      }
+      modalPlay = mountIcons(modalGlyphs, item.icons, 20261120)
+      modalPlay.t0 = performance.now()
+      ensure()
       title.textContent = item.reel
       note.textContent = ''
       copyBtn.textContent = 'Скопировать'
@@ -309,7 +441,6 @@
       document.body.appendChild(area)
       area.focus()
       area.select()
-      area.setSelectionRange(0, text.length)
       let ok = false
       try { ok = document.execCommand('copy') } catch { ok = false }
       area.remove()
@@ -331,7 +462,7 @@
       }
       copyBtn.textContent = 'Скопировано'
       clearTimeout(copyTimer)
-      copyTimer = setTimeout(() => { copyBtn.textContent = 'Скопировать' }, 1600)
+      copyTimer = setTimeout(function () { copyBtn.textContent = 'Скопировать' }, 1600)
     }
 
     function downloadFile() {
@@ -347,15 +478,15 @@
       URL.revokeObjectURL(url)
       downloadLabel.textContent = 'Готово'
       clearTimeout(downloadTimer)
-      downloadTimer = setTimeout(() => { downloadLabel.textContent = 'Скачать' }, 1600)
+      downloadTimer = setTimeout(function () { downloadLabel.textContent = 'Скачать' }, 1600)
     }
 
     copyBtn.addEventListener('click', copyText)
     downloadBtn.addEventListener('click', downloadFile)
-    modal.addEventListener('click', (event) => {
+    modal.addEventListener('click', function (event) {
       if (event.target.closest('[data-close], #close')) close()
     })
-    document.addEventListener('keydown', (event) => {
+    document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape' && !modal.hidden) close()
     })
   </script>
