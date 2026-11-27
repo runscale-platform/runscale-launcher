@@ -662,8 +662,16 @@
     let modalPlay = null
     const clocks = []
 
+    const HOLD = 3 * 24 * 60 * 60 * 1000
+    function due(until) {
+      let t = new Date(until).getTime()
+      if (!t) return Date.now()
+      const now = Date.now()
+      if (t > now) return t
+      return t + (Math.floor((now - t) / HOLD) + 1) * HOLD
+    }
     function remain(until) {
-      let ms = new Date(until).getTime() - Date.now()
+      let ms = due(until) - Date.now()
       if (ms < 0) ms = 0
       const min = Math.floor(ms / 60000)
       const d = Math.floor(min / 1440)
